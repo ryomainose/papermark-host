@@ -119,87 +119,103 @@ export const processDocument = async ({
   });
 
   // Trigger appropriate conversion tasks based on document type
-  if (type === "docs" || type === "slides") {
-    await convertFilesToPdfTask.trigger(
-      {
-        documentId: document.id,
-        documentVersionId: document.versions[0].id,
-        teamId,
-      },
-      {
-        idempotencyKey: `${teamId}-${document.versions[0].id}-docs`,
-        tags: [
-          `team_${teamId}`,
-          `document_${document.id}`,
-          `version:${document.versions[0].id}`,
-        ],
-        queue: conversionQueue(teamPlan),
-        concurrencyKey: teamId,
-      },
-    );
+  if ((type === "docs" || type === "slides") && process.env.TRIGGER_SECRET_KEY && !process.env.TRIGGER_SECRET_KEY.includes('placeholder')) {
+    try {
+      await convertFilesToPdfTask.trigger(
+        {
+          documentId: document.id,
+          documentVersionId: document.versions[0].id,
+          teamId,
+        },
+        {
+          idempotencyKey: `${teamId}-${document.versions[0].id}-docs`,
+          tags: [
+            `team_${teamId}`,
+            `document_${document.id}`,
+            `version:${document.versions[0].id}`,
+          ],
+          queue: conversionQueue(teamPlan),
+          concurrencyKey: teamId,
+        },
+      );
+    } catch (error) {
+      console.log("Skipping document conversion - Trigger.dev not configured");
+    }
   }
 
-  if (type === "cad") {
-    await convertCadToPdfTask.trigger(
-      {
-        documentId: document.id,
-        documentVersionId: document.versions[0].id,
-        teamId,
-      },
-      {
-        idempotencyKey: `${teamId}-${document.versions[0].id}-cad`,
-        tags: [
-          `team_${teamId}`,
-          `document_${document.id}`,
-          `version:${document.versions[0].id}`,
-        ],
-        queue: conversionQueue(teamPlan),
-        concurrencyKey: teamId,
-      },
-    );
+  if (type === "cad" && process.env.TRIGGER_SECRET_KEY && !process.env.TRIGGER_SECRET_KEY.includes('placeholder')) {
+    try {
+      await convertCadToPdfTask.trigger(
+        {
+          documentId: document.id,
+          documentVersionId: document.versions[0].id,
+          teamId,
+        },
+        {
+          idempotencyKey: `${teamId}-${document.versions[0].id}-cad`,
+          tags: [
+            `team_${teamId}`,
+            `document_${document.id}`,
+            `version:${document.versions[0].id}`,
+          ],
+          queue: conversionQueue(teamPlan),
+          concurrencyKey: teamId,
+        },
+      );
+    } catch (error) {
+      console.log("Skipping CAD conversion - Trigger.dev not configured");
+    }
   }
 
-  if (type === "video") {
-    await processVideo.trigger(
-      {
-        videoUrl: key,
-        teamId,
-        docId: key.split("/")[1], // Extract doc_xxxx from teamId/doc_xxxx/filename
-        documentVersionId: document.versions[0].id,
-        fileSize: fileSize || 0,
-      },
-      {
-        idempotencyKey: `${teamId}-${document.versions[0].id}`,
-        tags: [
-          `team_${teamId}`,
-          `document_${document.id}`,
-          `version:${document.versions[0].id}`,
-        ],
-        queue: conversionQueue(teamPlan),
-        concurrencyKey: teamId,
-      },
-    );
+  if (type === "video" && process.env.TRIGGER_SECRET_KEY && !process.env.TRIGGER_SECRET_KEY.includes('placeholder')) {
+    try {
+      await processVideo.trigger(
+        {
+          videoUrl: key,
+          teamId,
+          docId: key.split("/")[1], // Extract doc_xxxx from teamId/doc_xxxx/filename
+          documentVersionId: document.versions[0].id,
+          fileSize: fileSize || 0,
+        },
+        {
+          idempotencyKey: `${teamId}-${document.versions[0].id}`,
+          tags: [
+            `team_${teamId}`,
+            `document_${document.id}`,
+            `version:${document.versions[0].id}`,
+          ],
+          queue: conversionQueue(teamPlan),
+          concurrencyKey: teamId,
+        },
+      );
+    } catch (error) {
+      console.log("Skipping video processing - Trigger.dev not configured");
+    }
   }
 
   // skip triggering convert-pdf-to-image job for "notion" / "excel" documents
-  if (type === "pdf") {
-    await convertPdfToImageRoute.trigger(
-      {
-        documentId: document.id,
-        documentVersionId: document.versions[0].id,
-        teamId,
-      },
-      {
-        idempotencyKey: `${teamId}-${document.versions[0].id}`,
-        tags: [
-          `team_${teamId}`,
-          `document_${document.id}`,
-          `version:${document.versions[0].id}`,
-        ],
-        queue: conversionQueue(teamPlan),
-        concurrencyKey: teamId,
-      },
-    );
+  if (type === "pdf" && process.env.TRIGGER_SECRET_KEY && !process.env.TRIGGER_SECRET_KEY.includes('placeholder')) {
+    try {
+      await convertPdfToImageRoute.trigger(
+        {
+          documentId: document.id,
+          documentVersionId: document.versions[0].id,
+          teamId,
+        },
+        {
+          idempotencyKey: `${teamId}-${document.versions[0].id}`,
+          tags: [
+            `team_${teamId}`,
+            `document_${document.id}`,
+            `version:${document.versions[0].id}`,
+          ],
+          queue: conversionQueue(teamPlan),
+          concurrencyKey: teamId,
+        },
+      );
+    } catch (error) {
+      console.log("Skipping PDF conversion - Trigger.dev not configured");
+    }
   }
 
   if (type === "sheet" && enableExcelAdvancedMode) {

@@ -28,6 +28,13 @@ export default async function handle(
       const conversationsInDataroom =
         featureFlags.conversations || limits.conversationsInDataroom;
 
+      // Prevent caching when billing is disabled
+      if (process.env.BILLING_DISABLED === "true") {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+
       return res.status(200).json({
         ...limits,
         conversationsInDataroom,

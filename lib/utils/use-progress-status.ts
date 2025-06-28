@@ -15,10 +15,13 @@ export function useDocumentProgressStatus(
   documentVersionId: string,
   publicAccessToken: string | undefined,
 ) {
+  // Disable realtime connection if using a development mock token
+  const isValidToken = publicAccessToken && !publicAccessToken.startsWith('dev_token_');
+  
   const { runs, error } = useRealtimeRunsWithTag(
     `version:${documentVersionId}`,
     {
-      enabled: !!publicAccessToken,
+      enabled: !!isValidToken,
       accessToken: publicAccessToken,
     },
   );
@@ -33,6 +36,19 @@ export function useDocumentProgressStatus(
     progress: 0,
     text: "Initializing...",
   };
+
+  // If we're using a development token, skip processing and mark as complete
+  if (!isValidToken) {
+    return { 
+      status: {
+        state: "COMPLETED",
+        progress: 100,
+        text: "Ready to share"
+      }, 
+      error: null, 
+      run: undefined 
+    };
+  }
 
   // If we have no runs at all
   if (runs.length === 0) {

@@ -62,6 +62,67 @@ export async function getLimits({
   teamId: string;
   userId: string;
 }) {
+  // Check if billing is disabled
+  console.log("BILLING_DISABLED:", process.env.BILLING_DISABLED);
+  if (process.env.BILLING_DISABLED === "true") {
+    console.log("Billing disabled - returning unlimited limits");
+    const team = await prisma.team.findUnique({
+      where: {
+        id: teamId,
+        users: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+      select: {
+        _count: {
+          select: {
+            documents: true,
+            links: true,
+            users: true,
+            invitations: true,
+          },
+        },
+      },
+    });
+
+    if (!team) {
+      throw new Error("Team not found");
+    }
+
+    const documentCount = team._count.documents;
+    const linkCount = team._count.links;
+    const userCount = team._count.users + team._count.invitations;
+
+    // Return unlimited access when billing is disabled
+    // Use a very large number instead of Infinity since JSON.stringify converts Infinity to null
+    const UNLIMITED = 999999999;
+    const unlimitedLimits = {
+      datarooms: UNLIMITED,
+      links: UNLIMITED,
+      documents: UNLIMITED,
+      users: UNLIMITED,
+      domains: UNLIMITED,
+      customDomainOnPro: true,
+      customDomainInDataroom: true,
+      advancedLinkControlsOnPro: true,
+      watermarkOnBusiness: true,
+      conversationsInDataroom: true,
+      fileSizeLimits: {
+        video: UNLIMITED,
+        document: UNLIMITED,
+        image: UNLIMITED,
+        excel: UNLIMITED,
+        maxFiles: UNLIMITED,
+        maxPages: UNLIMITED,
+      },
+      usage: { documents: documentCount, links: linkCount, users: userCount },
+    };
+    console.log("Returning unlimited limits:", JSON.stringify(unlimitedLimits, null, 2));
+    return unlimitedLimits;
+  }
+
   const team = await prisma.team.findUnique({
     where: {
       id: teamId,

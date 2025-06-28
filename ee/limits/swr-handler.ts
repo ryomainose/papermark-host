@@ -34,7 +34,21 @@ export function useLimits() {
     : true;
   const canAddLinks = data?.links ? data?.usage?.links < data?.links : true;
   const canAddUsers = data?.users ? data?.usage?.users < data?.users : true;
-  const showUpgradePlanModal = (isFree && !isTrial) || (isTrial && !canAddUsers);
+  
+  // Check if billing is disabled via environment variable
+  // If limits are set to a very large number (999999999), it means billing is disabled
+  const UNLIMITED = 999999999;
+  const billingDisabled = data?.users === UNLIMITED;
+  
+  console.log("useLimits data:", data);
+  console.log("billingDisabled:", billingDisabled);
+  console.log("isFree:", isFree, "isTrial:", isTrial, "canAddUsers:", canAddUsers);
+  
+  const showUpgradePlanModal = billingDisabled 
+    ? false 
+    : (isFree && !isTrial) || (isTrial && !canAddUsers);
+    
+  console.log("showUpgradePlanModal:", showUpgradePlanModal);
 
   return {
     showUpgradePlanModal,

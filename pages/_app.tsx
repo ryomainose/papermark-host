@@ -19,7 +19,7 @@ import "@/styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function App({
+function App({
   Component,
   pageProps: { session, ...pageProps },
   router,
@@ -99,3 +99,5 @@ export default function App({
     </>
   );
 }
+
+export default App;
