@@ -2,11 +2,10 @@
 
 import { Metadata } from "next";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-import { signInWithPasskey } from "@teamhanko/passkeys-next-auth-provider/client";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -16,7 +15,6 @@ import { cn } from "@/lib/utils";
 import { LastUsed, useLastUsed } from "@/components/hooks/useLastUsed";
 import Google from "@/components/shared/icons/google";
 import LinkedIn from "@/components/shared/icons/linkedin";
-import Passkey from "@/components/shared/icons/passkey";
 import { LogoCloud } from "@/components/shared/logo-cloud";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,9 +22,10 @@ import { Label } from "@/components/ui/label";
 
 export default function Login() {
   const { next } = useParams as { next?: string };
+  const searchParams = useSearchParams();
 
   const [lastUsed, setLastUsed] = useLastUsed();
-  const authMethods = ["google", "email", "linkedin", "passkey"] as const;
+  const authMethods = ["google", "email", "linkedin"] as const;
   type AuthMethod = (typeof authMethods)[number];
   const [clickedMethod, setClickedMethod] = useState<AuthMethod | undefined>(
     undefined,
@@ -44,6 +43,14 @@ export default function Login() {
     .email({ message: "Please enter a valid email." });
 
   const emailValidation = emailSchema.safeParse(email);
+
+  useEffect(() => {
+    const message = searchParams.get('message');
+    if (message === 'check-email') {
+      setEmailButtonText("Email sent - check your inbox!");
+      toast.success("Email sent - check your inbox!");
+    }
+  }, [searchParams]);
 
   return (
     <div className="flex h-screen w-full flex-wrap">
@@ -79,21 +86,13 @@ export default function Login() {
               }
 
               setClickedMethod("email");
+              setLastUsed("credentials");
+              setEmailButtonText("Sending email...");
+              
+              // For email provider, use redirect: true to avoid JSON parsing issues
               signIn("email", {
                 email: emailValidation.data,
-                redirect: false,
-                ...(next && next.length > 0 ? { callbackUrl: next } : {}),
-              }).then((res) => {
-                if (res?.ok && !res?.error) {
-                  setEmail("");
-                  setLastUsed("credentials");
-                  setEmailButtonText("Email sent - check your inbox!");
-                  toast.success("Email sent - check your inbox!");
-                } else {
-                  setEmailButtonText("Error sending email - try again?");
-                  toast.error("Error sending email - try again?");
-                }
-                setClickedMethod(undefined);
+                ...(next && next.length > 0 ? { callbackUrl: `${window.location.origin}/login?message=check-email` } : { callbackUrl: `${window.location.origin}/login?message=check-email` }),
               });
             }}
           >
@@ -135,76 +134,60 @@ export default function Login() {
               {lastUsed === "credentials" && <LastUsed />}
             </div>
           </form>
-          <p className="py-4 text-center">or</p>
-          <div className="flex flex-col space-y-2 px-4 sm:px-12">
-            <div className="relative">
-              <Button
-                onClick={() => {
-                  setClickedMethod("google");
-                  setLastUsed("google");
-                  signIn("google", {
-                    ...(next && next.length > 0 ? { callbackUrl: next } : {}),
-                  }).then((res) => {
-                    if (res?.status) {
-                      setClickedMethod(undefined);
-                    }
-                  });
-                }}
-                loading={clickedMethod === "google"}
-                disabled={clickedMethod && clickedMethod !== "google"}
-                className="flex w-full items-center justify-center space-x-2 border border-gray-300 bg-gray-100 font-normal text-gray-900 hover:bg-gray-200"
-              >
-                <Google className="h-5 w-5" />
-                <span>Continue with Google</span>
-                {clickedMethod !== "google" && lastUsed === "google" && (
-                  <LastUsed />
-                )}
-              </Button>
+          {/* OAuth providers temporarily disabled until credentials are configured */}
+          {false && <p className="py-4 text-center">or</p>}
+          {false && (
+            <div className="flex flex-col space-y-2 px-4 sm:px-12">
+              <div className="relative">
+                <Button
+                  onClick={() => {
+                    setClickedMethod("google");
+                    setLastUsed("google");
+                    signIn("google", {
+                      ...(next && next.length > 0 ? { callbackUrl: next } : {}),
+                    }).then((res) => {
+                      if (res?.status) {
+                        setClickedMethod(undefined);
+                      }
+                    });
+                  }}
+                  loading={clickedMethod === "google"}
+                  disabled={clickedMethod && clickedMethod !== "google"}
+                  className="flex w-full items-center justify-center space-x-2 border border-gray-300 bg-gray-100 font-normal text-gray-900 hover:bg-gray-200"
+                >
+                  <Google className="h-5 w-5" />
+                  <span>Continue with Google</span>
+                  {clickedMethod !== "google" && lastUsed === "google" && (
+                    <LastUsed />
+                  )}
+                </Button>
+              </div>
+              <div className="relative">
+                <Button
+                  onClick={() => {
+                    setClickedMethod("linkedin");
+                    setLastUsed("linkedin");
+                    signIn("linkedin", {
+                      ...(next && next.length > 0 ? { callbackUrl: next } : {}),
+                    }).then((res) => {
+                      if (res?.status) {
+                        setClickedMethod(undefined);
+                      }
+                    });
+                  }}
+                  loading={clickedMethod === "linkedin"}
+                  disabled={clickedMethod && clickedMethod !== "linkedin"}
+                  className="flex w-full items-center justify-center space-x-2 border border-gray-300 bg-gray-100 font-normal text-gray-900 hover:bg-gray-200"
+                >
+                  <LinkedIn />
+                  <span>Continue with LinkedIn</span>
+                  {clickedMethod !== "linkedin" && lastUsed === "linkedin" && (
+                    <LastUsed />
+                  )}
+                </Button>
+              </div>
             </div>
-            <div className="relative">
-              <Button
-                onClick={() => {
-                  setClickedMethod("linkedin");
-                  setLastUsed("linkedin");
-                  signIn("linkedin", {
-                    ...(next && next.length > 0 ? { callbackUrl: next } : {}),
-                  }).then((res) => {
-                    if (res?.status) {
-                      setClickedMethod(undefined);
-                    }
-                  });
-                }}
-                loading={clickedMethod === "linkedin"}
-                disabled={clickedMethod && clickedMethod !== "linkedin"}
-                className="flex w-full items-center justify-center space-x-2 border border-gray-300 bg-gray-100 font-normal text-gray-900 hover:bg-gray-200"
-              >
-                <LinkedIn />
-                <span>Continue with LinkedIn</span>
-                {clickedMethod !== "linkedin" && lastUsed === "linkedin" && (
-                  <LastUsed />
-                )}
-              </Button>
-            </div>
-            <div className="relative">
-              <Button
-                onClick={() => {
-                  setLastUsed("passkey");
-                  setClickedMethod("passkey");
-                  signInWithPasskey({
-                    tenantId: process.env.NEXT_PUBLIC_HANKO_TENANT_ID as string,
-                  });
-                }}
-                variant="outline"
-                loading={clickedMethod === "passkey"}
-                disabled={clickedMethod && clickedMethod !== "passkey"}
-                className="flex w-full items-center justify-center space-x-2 border border-gray-300 bg-gray-100 font-normal text-gray-900 hover:bg-gray-200 hover:text-gray-900"
-              >
-                <Passkey className="h-4 w-4" />
-                <span>Continue with a passkey</span>
-                {lastUsed === "passkey" && <LastUsed />}
-              </Button>
-            </div>
-          </div>
+          )}
           <p className="mt-10 w-full max-w-md px-4 text-xs text-muted-foreground sm:px-12">
             By clicking continue, you acknowledge that you have read and agree
             to Papermark&apos;s{" "}
