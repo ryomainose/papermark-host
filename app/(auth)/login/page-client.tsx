@@ -6,7 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 
 import { useState, useEffect } from "react";
 
-import { signIn } from "next-auth/react";
+import { signIn, getCsrfToken } from "next-auth/react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -34,6 +34,7 @@ export default function Login() {
   const [emailButtonText, setEmailButtonText] = useState<string>(
     "Continue with Email",
   );
+  const [csrfToken, setCsrfToken] = useState<string>("");
 
   const emailSchema = z
     .string()
@@ -50,6 +51,11 @@ export default function Login() {
       setEmailButtonText("Email sent - check your inbox!");
       toast.success("Email sent - check your inbox!");
     }
+
+    // Get CSRF token
+    getCsrfToken().then((token) => {
+      if (token) setCsrfToken(token);
+    });
   }, [searchParams]);
 
   return (
@@ -78,9 +84,11 @@ export default function Login() {
           </div>
           <form
             className="flex flex-col gap-4 px-4 pt-8 sm:px-12"
+            action="/api/auth/signin/email"
+            method="POST"
             onSubmit={(e) => {
-              e.preventDefault();
               if (!emailValidation.success) {
+                e.preventDefault();
                 toast.error(emailValidation.error.errors[0].message);
                 return;
               }
@@ -88,19 +96,16 @@ export default function Login() {
               setClickedMethod("email");
               setLastUsed("credentials");
               setEmailButtonText("Sending email...");
-              
-              // For email provider, use redirect: true to avoid JSON parsing issues
-              signIn("email", {
-                email: emailValidation.data,
-                ...(next && next.length > 0 ? { callbackUrl: `${window.location.origin}/login?message=check-email` } : { callbackUrl: `${window.location.origin}/login?message=check-email` }),
-              });
             }}
           >
+            <input type="hidden" name="csrfToken" value={csrfToken} />
+            {next && <input type="hidden" name="callbackUrl" value={next} />}
             <Label className="sr-only" htmlFor="email">
               Email
             </Label>
             <Input
               id="email"
+              name="email"
               placeholder="name@example.com"
               type="email"
               autoCapitalize="none"
