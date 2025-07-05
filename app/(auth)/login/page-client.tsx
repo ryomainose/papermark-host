@@ -6,7 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 
 import { useState, useEffect } from "react";
 
-import { signIn, getCsrfToken } from "next-auth/react";
+// Removed NextAuth imports to avoid client-side interference
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -52,10 +52,11 @@ export default function Login() {
       toast.success("Email sent - check your inbox!");
     }
 
-    // Get CSRF token
-    getCsrfToken().then((token) => {
-      if (token) setCsrfToken(token);
-    });
+    // Get CSRF token manually
+    fetch("/api/auth/csrf")
+      .then(res => res.json())
+      .then(data => setCsrfToken(data.csrfToken))
+      .catch(err => console.error("CSRF fetch failed:", err));
   }, [searchParams]);
 
   return (
