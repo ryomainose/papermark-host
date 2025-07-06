@@ -46,7 +46,7 @@ export default function Login() {
   const emailValidation = emailSchema.safeParse(email);
 
   useEffect(() => {
-    const message = searchParams.get('message');
+    const message = searchParams?.get('message');
     if (message === 'check-email') {
       setEmailButtonText("Email sent - check your inbox!");
       toast.success("Email sent - check your inbox!");
