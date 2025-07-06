@@ -6,7 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 
 import { useState, useEffect } from "react";
 
-// Removed NextAuth imports to avoid client-side interference
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -140,60 +140,33 @@ export default function Login() {
               {lastUsed === "credentials" && <LastUsed />}
             </div>
           </form>
-          {/* OAuth providers temporarily disabled until credentials are configured */}
-          {false && <p className="py-4 text-center">or</p>}
-          {false && (
-            <div className="flex flex-col space-y-2 px-4 sm:px-12">
-              <div className="relative">
-                <Button
-                  onClick={() => {
-                    setClickedMethod("google");
-                    setLastUsed("google");
-                    signIn("google", {
-                      ...(next && next.length > 0 ? { callbackUrl: next } : {}),
-                    }).then((res) => {
-                      if (res?.status) {
-                        setClickedMethod(undefined);
-                      }
-                    });
-                  }}
-                  loading={clickedMethod === "google"}
-                  disabled={clickedMethod && clickedMethod !== "google"}
-                  className="flex w-full items-center justify-center space-x-2 border border-gray-300 bg-gray-100 font-normal text-gray-900 hover:bg-gray-200"
-                >
-                  <Google className="h-5 w-5" />
-                  <span>Continue with Google</span>
-                  {clickedMethod !== "google" && lastUsed === "google" && (
-                    <LastUsed />
-                  )}
-                </Button>
-              </div>
-              <div className="relative">
-                <Button
-                  onClick={() => {
-                    setClickedMethod("linkedin");
-                    setLastUsed("linkedin");
-                    signIn("linkedin", {
-                      ...(next && next.length > 0 ? { callbackUrl: next } : {}),
-                    }).then((res) => {
-                      if (res?.status) {
-                        setClickedMethod(undefined);
-                      }
-                    });
-                  }}
-                  loading={clickedMethod === "linkedin"}
-                  disabled={clickedMethod && clickedMethod !== "linkedin"}
-                  className="flex w-full items-center justify-center space-x-2 border border-gray-300 bg-gray-100 font-normal text-gray-900 hover:bg-gray-200"
-                >
-                  <LinkedIn />
-                  <span>Continue with LinkedIn</span>
-                  {clickedMethod !== "linkedin" && lastUsed === "linkedin" && (
-                    <LastUsed />
-                  )}
-                </Button>
-              </div>
+          <p className="py-4 text-center">or</p>
+          <div className="flex flex-col space-y-2 px-4 sm:px-12">
+            <div className="relative">
+              <Button
+                onClick={() => {
+                  setClickedMethod("google");
+                  setLastUsed("google");
+                  signIn("google", {
+                    ...(next && next.length > 0 ? { callbackUrl: next } : {}),
+                  }).then((res) => {
+                    if (res?.status) {
+                      setClickedMethod(undefined);
+                    }
+                  });
+                }}
+                loading={clickedMethod === "google"}
+                disabled={clickedMethod && clickedMethod !== "google"}
+                className="flex w-full items-center justify-center space-x-2 border border-gray-300 bg-gray-100 font-normal text-gray-900 hover:bg-gray-200"
+              >
+                <Google className="h-5 w-5" />
+                <span>Continue with Google</span>
+                {clickedMethod !== "google" && lastUsed === "google" && (
+                  <LastUsed />
+                )}
+              </Button>
             </div>
-          )}
+          </div>
           <p className="mt-10 w-full max-w-md px-4 text-xs text-muted-foreground sm:px-12">
             By clicking continue, you acknowledge that you have read and agree
             to Papermark&apos;s{" "}
