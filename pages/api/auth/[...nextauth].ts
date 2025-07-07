@@ -14,12 +14,36 @@ import { subscribe } from "@/lib/unsend";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
+// Diagnostic logging for Google OAuth environment variables
+if (process.env.NODE_ENV === "production") {
+  console.log("=== Google OAuth Environment Diagnostic ===");
+  console.log("GOOGLE_CLIENT_ID exists:", !!process.env.GOOGLE_CLIENT_ID);
+  console.log("GOOGLE_CLIENT_SECRET exists:", !!process.env.GOOGLE_CLIENT_SECRET);
+  console.log("GOOGLE_CLIENT_ID starts with:", process.env.GOOGLE_CLIENT_ID?.substring(0, 20) + "...");
+  console.log("GOOGLE_CLIENT_SECRET starts with:", process.env.GOOGLE_CLIENT_SECRET?.substring(0, 10) + "...");
+  console.log("NEXTAUTH_URL:", process.env.NEXTAUTH_URL);
+  console.log("VERCEL_URL:", process.env.VERCEL_URL);
+  console.log("===========================================");
+}
+
 // This function can run for a maximum of 180 seconds
 export const config = {
   maxDuration: 180,
 };
 
 export const authOptions: NextAuthOptions = {
+  debug: process.env.NODE_ENV === "production",
+  logger: {
+    error(code, metadata) {
+      console.error("NextAuth Error:", { code, metadata });
+    },
+    warn(code) {
+      console.warn("NextAuth Warning:", code);
+    },
+    debug(code, metadata) {
+      console.log("NextAuth Debug:", { code, metadata });
+    },
+  },
   pages: {
     error: "/login",
   },
