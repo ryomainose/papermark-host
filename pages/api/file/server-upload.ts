@@ -40,13 +40,32 @@ export default async function handler(
     console.log('BLOB_READ_WRITE_TOKEN prefix:', process.env.BLOB_READ_WRITE_TOKEN?.substring(0, 20) || 'NOT_FOUND');
     console.log('===============================');
 
-    // Upload to Vercel Blob using server method
-    const blob = await put(filename, req, {
-      access: 'public',
-    });
+    // Get the file content from request body
+    const chunks: Buffer[] = [];
+    
+    return new Promise((resolve) => {
+      req.on('data', (chunk) => chunks.push(chunk));
+      req.on('end', async () => {
+        try {
+          const fileBuffer = Buffer.concat(chunks);
+          
+          // Upload to Vercel Blob using simple put method like quickstart
+          const blob = await put(filename, fileBuffer, {
+            access: 'public',
+          });
 
-    console.log('Server upload success:', blob.url);
-    return res.status(200).json(blob);
+          console.log('Server upload success:', blob.url);
+          res.status(200).json(blob);
+          resolve(undefined);
+        } catch (error) {
+          console.error('Upload error:', error);
+          res.status(500).json({ 
+            error: error instanceof Error ? error.message : 'Unknown error' 
+          });
+          resolve(undefined);
+        }
+      });
+    });
 
   } catch (error) {
     console.error('Server upload error:', error);
