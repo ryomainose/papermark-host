@@ -138,3 +138,4 @@ If you'd like to contribute, please fork the repository and make any changes you
 # Deploy 2025年 7月 7日 月曜日 11時18分41秒 JST
 # Force redeploy 2025年 7月 7日 月曜日 21時31分46秒 JST
 # Redeploy with proper Vercel link 2025年 7月 7日 月曜日 21時42分59秒 JST
+# Redeploy after adding NEXT_PUBLIC_UPLOAD_TRANSPORT 2025年 7月 7日 月曜日 22時07分21秒 JST
