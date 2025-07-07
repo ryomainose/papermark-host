@@ -12,11 +12,23 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  // Log request details to validate assumptions
+  console.log('=== Browser Upload Debug ===');
+  console.log('Request method:', req.method);
+  console.log('Content-Type:', req.headers['content-type']);
+  console.log('Request body type:', typeof req.body);
+  console.log('Request body keys:', req.body ? Object.keys(req.body) : 'no body');
+  console.log('BLOB_READ_WRITE_TOKEN exists:', !!process.env.BLOB_READ_WRITE_TOKEN);
+  console.log('BLOB_READ_WRITE_TOKEN prefix:', process.env.BLOB_READ_WRITE_TOKEN?.substring(0, 20) || 'NOT_FOUND');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('===============================');
+
   try {
     const jsonResponse = await handleUpload({
       body: req.body,
       request: req,
       onBeforeGenerateToken: async (pathname: string) => {
+        console.log('onBeforeGenerateToken called with pathname:', pathname);
         // Generate a client token for the browser to upload the file
 
         const session = await getServerSession(req, res, authOptions);
@@ -48,7 +60,7 @@ export default async function handler(
           maxSize = 100 * 1024 * 1024; // 100 MB
         }
 
-        return {
+        const tokenConfig = {
           allowedContentTypes: [
             "application/pdf",
             "application/vnd.ms-excel",
@@ -60,6 +72,9 @@ export default async function handler(
             userId: (session.user as CustomUser).id,
           }),
         };
+        
+        console.log('Generated token config:', tokenConfig);
+        return tokenConfig;
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
         // Get notified of browser upload completion
@@ -76,8 +91,12 @@ export default async function handler(
       },
     });
 
+    console.log('handleUpload success, returning response');
     return res.status(200).json(jsonResponse);
   } catch (error) {
+    console.error('handleUpload error:', error);
+    console.error('Error type:', error?.constructor?.name);
+    console.error('Error message:', (error as Error).message);
     // The webhook will retry 5 times waiting for a 200
     return res.status(400).json({ error: (error as Error).message });
   }
