@@ -12,14 +12,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const body = req.body as HandleUploadBody;
-
   try {
-    console.log('Browser upload - BLOB_READ_WRITE_TOKEN exists:', !!process.env.BLOB_READ_WRITE_TOKEN);
-    console.log('Browser upload - token starts with:', process.env.BLOB_READ_WRITE_TOKEN?.substring(0, 15));
-    
     const jsonResponse = await handleUpload({
-      body,
+      body: req.body,
       request: req,
       onBeforeGenerateToken: async (pathname: string) => {
         // Generate a client token for the browser to upload the file
