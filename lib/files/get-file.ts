@@ -16,9 +16,7 @@ export const getFile = async ({
   const url = await match(type)
     .with(DocumentStorageType.VERCEL_BLOB, () => {
       if (isDownload) {
-        return getDownloadUrl(data, {
-          token: process.env.papermark_READ_WRITE_TOKEN!,
-        });
+        return getDownloadUrl(data);
       } else {
         return data;
       }
