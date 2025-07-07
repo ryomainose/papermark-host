@@ -117,7 +117,7 @@ const nextConfig = {
           },
         ],
       },
-      {
+      ...(process.env.NEXT_PUBLIC_WEBHOOK_BASE_HOST ? [{
         source: "/services/:path*",
         has: [
           {
@@ -131,7 +131,7 @@ const nextConfig = {
             value: "noindex",
           },
         ],
-      },
+      }] : []),
       {
         source: "/api/webhooks/services/:path*",
         headers: [
