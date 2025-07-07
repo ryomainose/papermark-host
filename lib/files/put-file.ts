@@ -44,10 +44,18 @@ export const putFile = async ({
 };
 
 const putFileInVercel = async (file: File) => {
-  const newBlob = await upload(file.name, file, {
-    access: "public",
-    handleUploadUrl: "/api/file/browser-upload",
+  // Use server upload method instead of client upload
+  const response = await fetch(`/api/file/server-upload?filename=${encodeURIComponent(file.name)}`, {
+    method: 'POST',
+    body: file,
   });
+
+  if (!response.ok) {
+    const errorData = await response.text();
+    throw new Error(`Upload failed: ${response.status} ${errorData}`);
+  }
+
+  const newBlob = await response.json();
 
   let numPages: number = 1;
   if (file.type === "application/pdf") {
