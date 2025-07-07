@@ -8,11 +8,12 @@ const nextConfig = {
   },
   transpilePackages: ["react-syntax-highlighter"],
   skipTrailingSlashRedirect: true,
-  assetPrefix:
-    process.env.NODE_ENV === "production" &&
-    process.env.VERCEL_ENV === "production"
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : undefined,
+  // Temporarily disabled assetPrefix to fix CSS loading in production
+  // assetPrefix:
+  //   process.env.NODE_ENV === "production" &&
+  //   process.env.VERCEL_ENV === "production"
+  //     ? process.env.NEXT_PUBLIC_BASE_URL
+  //     : undefined,
   async redirects() {
     return [
       {
@@ -81,7 +82,6 @@ const nextConfig = {
               `font-src 'self' data: https: ${isDev ? "http:" : ""}; ` +
               `frame-ancestors 'none'; ` +
               `connect-src 'self' https: ${isDev ? "http: ws: wss:" : ""}; ` + // Add WebSocket for hot reload
-              `${isDev ? "" : "upgrade-insecure-requests;"} ` +
               "report-to csp-endpoint;",
           },
         ],

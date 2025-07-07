@@ -1,16 +1,18 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
+// Disable static generation for this route
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  const inter = await fetch(
-    new URL("@/styles/Inter-Regular.ttf", import.meta.url),
-  ).then((res) => res.arrayBuffer());
+  try {
+    const inter = await fetch(
+      new URL("@/styles/Inter-Regular.ttf", import.meta.url),
+    ).then((res) => res.arrayBuffer());
 
-  const interBold = await fetch(
-    new URL("@/public/_static/Inter-Bold.ttf", import.meta.url),
-  ).then((res) => res.arrayBuffer());
+    const interBold = await fetch(
+      new URL("@/public/_static/Inter-Bold.ttf", import.meta.url),
+    ).then((res) => res.arrayBuffer());
 
   const year = req.nextUrl.searchParams.get("year") || "2024";
   const minutesSpentOnDocs =
@@ -97,4 +99,12 @@ export async function GET(req: NextRequest) {
       ],
     },
   );
+  } catch (error) {
+    console.error('Failed to generate OG image:', error);
+    // Return a simple error response
+    return new Response('Failed to generate image', { 
+      status: 500,
+      headers: { 'Content-Type': 'text/plain' }
+    });
+  }
 }

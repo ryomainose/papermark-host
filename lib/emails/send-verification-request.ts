@@ -15,7 +15,9 @@ export const sendVerificationRequestEmail = async (params: {
     checksum,
   });
 
-  const verificationUrl = `${process.env.NEXTAUTH_URL}/verify?${verificationUrlParams}`;
+  // Extract the base URL from the NextAuth verification URL
+  const baseUrl = new URL(url).origin;
+  const verificationUrl = `${baseUrl}/verify?${verificationUrlParams}`;
   const emailTemplate = LoginLink({ url: verificationUrl });
   try {
     await sendEmail({
