@@ -46,7 +46,6 @@ const copyFileInVercelServer = async ({
 
   const blob = await put(newFileName, contents, {
     access: "public",
-    token: process.env.papermark_READ_WRITE_TOKEN!,
   });
 
   return {

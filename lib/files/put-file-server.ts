@@ -51,7 +51,6 @@ const putFileInVercelServer = async (file: File) => {
 
   const blob = await put(file.name, contents, {
     access: "public",
-    token: process.env.papermark_READ_WRITE_TOKEN!,
   });
 
   return {
