@@ -15,6 +15,9 @@ export default async function handler(
   const body = req.body as HandleUploadBody;
 
   try {
+    console.log('Browser upload - BLOB_READ_WRITE_TOKEN exists:', !!process.env.BLOB_READ_WRITE_TOKEN);
+    console.log('Browser upload - token starts with:', process.env.BLOB_READ_WRITE_TOKEN?.substring(0, 15));
+    
     const jsonResponse = await handleUpload({
       body,
       request: req,
