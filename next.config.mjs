@@ -16,7 +16,7 @@ const nextConfig = {
   //     : undefined,
   async redirects() {
     return [
-      {
+      ...(process.env.NEXT_PUBLIC_APP_BASE_HOST ? [{
         source: "/",
         destination: "/dashboard",
         permanent: false,
@@ -26,7 +26,7 @@ const nextConfig = {
             value: process.env.NEXT_PUBLIC_APP_BASE_HOST,
           },
         ],
-      },
+      }] : []),
       {
         source: "/view/cm2xiaxzo000d147xszm9q72o",
         destination: "/view/cm34cqqqx000212oekj9upn8o",
