@@ -25,7 +25,9 @@ export const deleteFile = async ({ type, data, teamId }: DeleteFileOptions) => {
 };
 
 const deleteFileFromVercelServer = async (url: string) => {
-  await del(url);
+  await del(url, {
+    token: process.env.papermark_READ_WRITE_TOKEN!,
+  });
 };
 
 const deleteAllFilesFromS3Server = async (data: string, teamId: string) => {
