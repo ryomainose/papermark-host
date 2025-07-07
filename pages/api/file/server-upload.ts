@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { put } from '@vercel/blob';
 import { getServerSession } from "next-auth/next";
 import { CustomUser } from "@/lib/types";
-import { authOptions } from "./auth/[...nextauth]";
+import { authOptions } from "../auth/[...nextauth]";
 
 export const config = {
   api: {
