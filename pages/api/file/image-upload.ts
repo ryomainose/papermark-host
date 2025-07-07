@@ -43,6 +43,7 @@ export default async function handler(
     const jsonResponse = await handleUpload({
       body,
       request: req,
+      token: process.env.papermark_READ_WRITE_TOKEN!,
       onBeforeGenerateToken: async (pathname: string) => {
         // Generate a client token for the browser to upload the file
 
