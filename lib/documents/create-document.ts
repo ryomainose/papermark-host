@@ -26,15 +26,15 @@ export const createDocument = async ({
   createLink?: boolean;
   token?: string;
 }) => {
-  // FIXED: Use relative URL instead of environment variable
+  // FINAL FIX: Force relative URL with cache busting
   const apiUrl = `/api/teams/${teamId}/documents`;
+  const timestamp = Date.now();
   
-  // NUCLEAR DEBUG: Removed NEXT_PUBLIC_BASE_URL from environment completely
-  console.log('🚀 NUCLEAR_FIX_v3: Environment variable should now be undefined!');
-  console.log('🚀 Using relative URL:', apiUrl);
-  console.log('🚀 Environment var value (should be undefined):', process.env.NEXT_PUBLIC_BASE_URL);
-  console.log('🚀 typeof env var:', typeof process.env.NEXT_PUBLIC_BASE_URL);
-  console.log('🚀 Current origin:', typeof window !== 'undefined' ? window.location.origin : 'server-side');
+  console.log('🔥 FINAL_FIX_v4: Cache busted version!', timestamp);
+  console.log('🔥 Using relative URL:', apiUrl);
+  console.log('🔥 Environment var:', process.env.NEXT_PUBLIC_BASE_URL);
+  console.log('🔥 Window origin:', typeof window !== 'undefined' ? window.location.origin : 'server-side');
+  console.log('🔥 Full fetch URL will be:', typeof window !== 'undefined' ? window.location.origin + apiUrl : 'relative: ' + apiUrl);
   
   const response = await fetch(
     apiUrl,
