@@ -27,8 +27,13 @@ export const createDocument = async ({
   token?: string;
 }) => {
   // create a document in the database with the blob url
+  const url = `/api/teams/${teamId}/documents`;
+  console.log('🔍 createDocument URL:', url);
+  console.log('🔍 NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL);
+  console.log('🔍 teamId:', teamId);
+  
   const response = await fetch(
-    `/api/teams/${teamId}/documents`,
+    url,
     {
       method: "POST",
       headers: {
