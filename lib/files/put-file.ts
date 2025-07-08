@@ -128,7 +128,7 @@ const putFileInS3 = async ({
   }
 
   const presignedResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/file/s3/get-presigned-post-url`,
+    `/api/file/s3/get-presigned-post-url`,
     {
       method: "POST",
       headers: {
