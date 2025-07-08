@@ -26,16 +26,17 @@ export const createDocument = async ({
   createLink?: boolean;
   token?: string;
 }) => {
-  // create a document in the database with the blob url
-  const url = `/api/teams/${teamId}/documents`;
-  console.log('🔍 DEPLOYMENT_CHECK: New code is live!');
-  console.log('🔍 createDocument URL:', url);
-  console.log('🔍 NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL);
-  console.log('🔍 teamId:', teamId);
-  console.log('🔍 window.location.origin:', typeof window !== 'undefined' ? window.location.origin : 'server-side');
+  // FIXED: Use relative URL instead of environment variable
+  const apiUrl = `/api/teams/${teamId}/documents`;
+  
+  // Debug logging to verify deployment
+  console.log('🚀 CACHE_BUST_v2: New deployment is live!');
+  console.log('🚀 Using relative URL:', apiUrl);
+  console.log('🚀 Environment var value:', process.env.NEXT_PUBLIC_BASE_URL);
+  console.log('🚀 Current origin:', typeof window !== 'undefined' ? window.location.origin : 'server-side');
   
   const response = await fetch(
-    url,
+    apiUrl,
     {
       method: "POST",
       headers: {
