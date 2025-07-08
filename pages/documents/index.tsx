@@ -17,6 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 export default function Documents() {
+  // Debug environment variable on page load
+  console.log('🔍 ENVIRONMENT DEBUG on documents page load:');
+  console.log('🔍 NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL);
+  console.log('🔍 Length:', process.env.NEXT_PUBLIC_BASE_URL?.length);
+  console.log('🔍 Full value:', JSON.stringify(process.env.NEXT_PUBLIC_BASE_URL));
+  
   const router = useRouter();
   const teamInfo = useTeam();
   const queryParams = router.query;

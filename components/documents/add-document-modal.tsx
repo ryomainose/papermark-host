@@ -352,6 +352,10 @@ export function AddDocumentModal({
     try {
       setUploading(true);
 
+      console.log('🎯 ADD_DOCUMENT_MODAL: Making direct fetch call');
+      console.log('🎯 URL being constructed:', `/api/teams/${teamInfo?.currentTeam?.id}/documents`);
+      console.log('🎯 teamInfo?.currentTeam?.id:', teamInfo?.currentTeam?.id);
+      
       const response = await fetch(
         `/api/teams/${teamInfo?.currentTeam?.id}/documents`,
         {
