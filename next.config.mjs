@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // CRITICAL FIX: Override environment variable to prevent truncation
+  env: {
+    NEXT_PUBLIC_BASE_URL: undefined,
+  },
   reactStrictMode: true,
   pageExtensions: ["js", "jsx", "ts", "tsx", "mdx"],
   images: {
