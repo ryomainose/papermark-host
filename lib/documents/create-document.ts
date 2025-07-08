@@ -28,6 +28,7 @@ export const createDocument = async ({
 }) => {
   // create a document in the database with the blob url
   const url = `/api/teams/${teamId}/documents`;
+  console.log('🔍 DEPLOYMENT_CHECK: New code is live!');
   console.log('🔍 createDocument URL:', url);
   console.log('🔍 NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL);
   console.log('🔍 teamId:', teamId);
