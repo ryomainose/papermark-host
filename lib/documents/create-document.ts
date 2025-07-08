@@ -31,6 +31,7 @@ export const createDocument = async ({
   console.log('🔍 createDocument URL:', url);
   console.log('🔍 NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL);
   console.log('🔍 teamId:', teamId);
+  console.log('🔍 window.location.origin:', typeof window !== 'undefined' ? window.location.origin : 'server-side');
   
   const response = await fetch(
     url,
