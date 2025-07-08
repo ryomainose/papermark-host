@@ -29,10 +29,11 @@ export const createDocument = async ({
   // FIXED: Use relative URL instead of environment variable
   const apiUrl = `/api/teams/${teamId}/documents`;
   
-  // Debug logging to verify deployment
-  console.log('🚀 CACHE_BUST_v2: New deployment is live!');
+  // NUCLEAR DEBUG: Removed NEXT_PUBLIC_BASE_URL from environment completely
+  console.log('🚀 NUCLEAR_FIX_v3: Environment variable should now be undefined!');
   console.log('🚀 Using relative URL:', apiUrl);
-  console.log('🚀 Environment var value:', process.env.NEXT_PUBLIC_BASE_URL);
+  console.log('🚀 Environment var value (should be undefined):', process.env.NEXT_PUBLIC_BASE_URL);
+  console.log('🚀 typeof env var:', typeof process.env.NEXT_PUBLIC_BASE_URL);
   console.log('🚀 Current origin:', typeof window !== 'undefined' ? window.location.origin : 'server-side');
   
   const response = await fetch(
