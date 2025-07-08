@@ -44,18 +44,50 @@ export const putFile = async ({
 };
 
 const putFileInVercel = async (file: File) => {
+  console.log('=== Client Upload Debug ===');
+  console.log('File name:', file.name);
+  console.log('File size:', file.size);
+  console.log('File type:', file.type);
+  console.log('File lastModified:', file.lastModified);
+  console.log('===============================');
+
   // Use server upload method instead of client upload
   const response = await fetch(`/api/file/server-upload?filename=${encodeURIComponent(file.name)}`, {
     method: 'POST',
     body: file,
+    headers: {
+      'Content-Type': file.type || 'application/octet-stream',
+    },
   });
+
+  console.log('=== Server Response Debug ===');
+  console.log('Response status:', response.status);
+  console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+  console.log('==============================');
 
   if (!response.ok) {
     const errorData = await response.text();
+    console.error('Upload failed with error:', errorData);
+    console.error('Response status:', response.status);
+    console.error('Response statusText:', response.statusText);
     throw new Error(`Upload failed: ${response.status} ${errorData}`);
   }
 
-  const newBlob = await response.json();
+  let newBlob;
+  try {
+    newBlob = await response.json();
+    console.log('=== Received Blob Response ===');
+    console.log('Blob data:', newBlob);
+    console.log('Blob URL:', newBlob.url);
+    console.log('==============================');
+  } catch (parseError) {
+    console.error('=== JSON Parse Error ===');
+    console.error('Parse error:', parseError);
+    const responseText = await response.text();
+    console.error('Raw response:', responseText);
+    console.error('========================');
+    throw new Error(`Failed to parse response: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
+  }
 
   let numPages: number = 1;
   if (file.type === "application/pdf") {
