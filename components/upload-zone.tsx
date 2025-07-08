@@ -332,6 +332,10 @@ export default function UploadZone({
 
         const fileUploadPathName = file?.whereToUploadPath;
 
+        console.log('🎯 UPLOAD_ZONE: About to call createDocument');
+        console.log('🎯 teamId:', teamInfo?.currentTeam?.id);
+        console.log('🎯 documentData:', documentData);
+        
         const response = await createDocument({
           documentData,
           teamId: teamInfo?.currentTeam?.id as string,
