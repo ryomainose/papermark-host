@@ -139,8 +139,8 @@ export const getStaticProps = async (context: GetStaticPropsContext) => {
             metaFavicon: link.metaFavicon ?? "/favicon.ico",
             metaUrl: `https://www.papermark.com/view/${linkId}`,
           },
-          showPoweredByBanner: link.showBanner || teamPlan === "free",
-          showAccountCreationSlide: link.showBanner || teamPlan === "free",
+          showPoweredByBanner: false,
+          showAccountCreationSlide: false,
           useAdvancedExcelViewer: advancedExcelEnabled,
           useCustomAccessForm:
             teamId === "cm0154tiv0000lr2t6nr5c6kp" ||

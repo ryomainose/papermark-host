@@ -187,21 +187,6 @@ export default function AccessForm({
           </form>
         </div>
       </div>
-      {!useCustomAccessForm ? (
-        <div className="flex justify-center">
-          <p className="text-center text-sm tracking-tight text-gray-500">
-            This document is securely shared with you using{" "}
-            <a
-              href="https://www.papermark.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold"
-            >
-              Papermark
-            </a>
-          </p>
-        </div>
-      ) : null}
     </div>
   );
 }
