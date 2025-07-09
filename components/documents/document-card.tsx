@@ -83,7 +83,7 @@ export default function DocumentsCard({
 
   function handleCopyToClipboard(id: string) {
     copyToClipboard(
-      `${process.env.NEXT_PUBLIC_MARKETING_URL || window.location.origin}/view/${id}`,
+      `https://papermark-pi-sandy.vercel.app/view/${id}`,
       "リンクをクリップボードにコピーしました。",
     );
   }

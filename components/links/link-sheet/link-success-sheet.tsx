@@ -50,7 +50,7 @@ export default function LinkSuccessSheet({
   const linkUrl =
     link.domainId && link.slug
       ? `https://${link.domainSlug}/${link.slug}`
-      : `${process.env.NEXT_PUBLIC_MARKETING_URL || window.location.origin}/view/${link.id}`;
+      : `https://papermark-pi-sandy.vercel.app/view/${link.id}`;
 
   const copyToClipboard = async () => {
     try {

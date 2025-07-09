@@ -245,7 +245,7 @@ export default function LinksTable({
     }
 
     const { previewToken } = await response.json();
-    const previewLink = `${process.env.NEXT_PUBLIC_MARKETING_URL}/view/${link.id}?previewToken=${previewToken}`;
+    const previewLink = `https://papermark-pi-sandy.vercel.app/view/${link.id}?previewToken=${previewToken}`;
 
     window.open(previewLink, "_blank");
   };
@@ -626,7 +626,7 @@ export default function LinksTable({
                             <div className="flex w-full whitespace-nowrap text-sm group-hover/cell:opacity-0">
                               {link.domainId
                                 ? `https://${link.domainSlug}/${link.slug}`
-                                : `${process.env.NEXT_PUBLIC_MARKETING_URL}/view/${link.id}`}
+                                : `https://papermark-pi-sandy.vercel.app/view/${link.id}`}
                             </div>
 
                             {link.domainId && isFree ? (
@@ -644,7 +644,7 @@ export default function LinksTable({
                                   handleCopyToClipboard(
                                     link.domainId
                                       ? `https://${link.domainSlug}/${link.slug}`
-                                      : `${process.env.NEXT_PUBLIC_MARKETING_URL}/view/${link.id}`,
+                                      : `https://papermark-pi-sandy.vercel.app/view/${link.id}`,
                                   )
                                 }
                                 title="Copy & Share"
