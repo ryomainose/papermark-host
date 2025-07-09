@@ -132,7 +132,7 @@ export default function AccessForm({
               color: determineTextColor(brand?.accentColor),
             }}
           >
-            Your action is requested to continue
+            続行するためにご協力をお願いします
           </h1>
         </div>
 
@@ -181,7 +181,7 @@ export default function AccessForm({
                     brand && brand.accentColor ? brand.accentColor : "black",
                 }}
               >
-                Continue
+                続行
               </Button>
             </div>
           </form>

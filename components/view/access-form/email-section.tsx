@@ -41,14 +41,14 @@ export default function EmailSection({
 
   const handleInvalid = (e: React.InvalidEvent<HTMLInputElement>) => {
     e.preventDefault(); // Prevent default browser validation popup
-    setEmailError("Please enter a valid email address");
+    setEmailError("有効なメールアドレスを入力してください");
   };
 
   const debouncedValidation = useDebouncedCallback(
     (value: string) => {
       const isValid = !value || validateEmail(value);
       if (isDirty && value && !isValid) {
-        setEmailError("Please enter a valid email address");
+        setEmailError("有効なメールアドレスを入力してください");
       } else {
         setEmailError(null);
       }
@@ -80,7 +80,7 @@ export default function EmailSection({
     const value = e.target.value;
     const isValid = !value || validateEmail(value);
     if (value && !isValid) {
-      setEmailError("Please enter a valid email address");
+      setEmailError("有効なメールアドレスを入力してください");
     }
     onValidationChange?.(isValid);
   };
@@ -99,7 +99,7 @@ export default function EmailSection({
           color: determineTextColor(brand?.accentColor),
         }}
       >
-        Email address
+        メールアドレス
       </label>
       <input
         name="email"
@@ -121,7 +121,7 @@ export default function EmailSection({
             : determineTextColor(brand?.accentColor),
         }}
         value={email || ""}
-        placeholder="Enter email"
+        placeholder="メールアドレスを入力"
         onChange={handleEmailChange}
         onInvalid={handleInvalid}
         onBlur={handleBlur}
@@ -144,8 +144,8 @@ export default function EmailSection({
       )}
       <p className="text-sm text-gray-500">
         {useCustomAccessForm
-          ? "This data will be shared with the content provider."
-          : "This data will be shared with the sender."}
+          ? "このデータはコンテンツ提供者と共有されます。"
+          : "このデータは送信者と共有されます。"}
       </p>
     </div>
   );
