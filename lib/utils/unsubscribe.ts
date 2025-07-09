@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.NEXT_PRIVATE_UNSUBSCRIBE_JWT_SECRET as string;
-const UNSUBSCRIBE_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL as string;
+const UNSUBSCRIBE_BASE_URL = process.env.NEXT_PUBLIC_MARKETING_URL as string;
 
 type UnsubscribePayload = {
   viewerId: string;

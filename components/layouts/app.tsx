@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import { AppBreadcrumb } from "@/components/layouts/breadcrumb";
 import TrialBanner from "@/components/layouts/trial-banner";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { Separator } from "@/components/ui/separator";
 import {
   SIDEBAR_COOKIE_NAME,
@@ -21,11 +22,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col gap-x-1 bg-gray-50 dark:bg-black md:flex-row">
         <AppSidebar />
         <SidebarInset className="ring-1 ring-gray-200 dark:ring-gray-800">
-          <header className="flex h-10 shrink-0 items-center gap-2">
+          <header className="flex h-10 shrink-0 items-center justify-between gap-2">
             <div className="flex items-center gap-2 px-4">
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-1 h-4" />
               <AppBreadcrumb />
+            </div>
+            <div className="px-4">
+              <LanguageSwitcher />
             </div>
           </header>
           <TrialBanner />

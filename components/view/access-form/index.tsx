@@ -132,7 +132,7 @@ export default function AccessForm({
               color: determineTextColor(brand?.accentColor),
             }}
           >
-            続行するためにご協力をお願いします
+            メールアドレスを入力してください
           </h1>
         </div>
 

@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 
 import { useTeam } from "@/context/team-context";
+import { useLanguage } from "@/context/language-context";
 import { FolderPlusIcon, PlusIcon } from "lucide-react";
 
 import useDocuments, { useRootFolders } from "@/lib/swr/use-documents";
@@ -17,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 export default function Documents() {
+  const { t } = useLanguage();
+  
   // Debug environment variable on page load
   console.log('🔍 ENVIRONMENT DEBUG on documents page load:');
   console.log('🔍 NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL);
@@ -61,20 +64,20 @@ export default function Documents() {
         <section className="mb-4 flex items-center justify-between space-x-2 sm:space-x-0">
           <div className="space-y-0 sm:space-y-1">
             <h2 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-              All Documents
+              {t('documents.title')}
             </h2>
             <p className="text-xs leading-4 text-muted-foreground sm:text-sm sm:leading-none">
-              Manage all your documents in one place.
+              {t('documents.subtitle')}
             </p>
           </div>
           <div className="flex items-center gap-x-2">
             <AddDocumentModal>
               <Button
                 className="group flex flex-1 items-center justify-start gap-x-1 whitespace-nowrap px-1 text-left sm:gap-x-3 sm:px-3"
-                title="Add Document"
+                title={t('documents.addDocument')}
               >
                 <PlusIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                <span className="text-xs sm:text-base">Add Document</span>
+                <span className="text-xs sm:text-base">{t('documents.addDocument')}</span>
               </Button>
             </AddDocumentModal>
             <AddFolderModal>

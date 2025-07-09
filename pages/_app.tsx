@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Head from "next/head";
 
 import { TeamProvider } from "@/context/team-context";
+import { LanguageProvider } from "@/context/language-context";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import PlausibleProvider from "next-plausible";
@@ -79,18 +80,20 @@ function App({
               enabled={process.env.NEXT_PUBLIC_VERCEL_ENV === "production"}
             >
               <NuqsAdapter>
-                <main className={inter.className}>
-                  <Toaster closeButton />
-                  <TooltipProvider delayDuration={100}>
-                    {EXCLUDED_PATHS.includes(router.pathname) ? (
-                      <Component {...pageProps} />
-                    ) : (
-                      <TeamProvider>
+                <LanguageProvider>
+                  <main className={inter.className}>
+                    <Toaster closeButton />
+                    <TooltipProvider delayDuration={100}>
+                      {EXCLUDED_PATHS.includes(router.pathname) ? (
                         <Component {...pageProps} />
-                      </TeamProvider>
-                    )}
-                  </TooltipProvider>
-                </main>
+                      ) : (
+                        <TeamProvider>
+                          <Component {...pageProps} />
+                        </TeamProvider>
+                      )}
+                    </TooltipProvider>
+                  </main>
+                </LanguageProvider>
               </NuqsAdapter>
             </PlausibleProvider>
           </ThemeProvider>

@@ -27,7 +27,7 @@ export default function EmbedCodeModal({
   const [copied, setCopied] = useState(false);
 
   const embedCode = `<iframe
-  src="${process.env.NEXT_PUBLIC_BASE_URL}/view/${linkId}/embed"
+  src="${process.env.NEXT_PUBLIC_MARKETING_URL}/view/${linkId}/embed"
   style="width: 100%; height: 100%; border: none; border-radius: 8px;"
   allow="fullscreen"
   loading="lazy">
