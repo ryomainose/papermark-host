@@ -161,13 +161,19 @@ export default async function handle(
 
       const verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
 
-      sendTeammateInviteEmail({
-        senderName: sender.name || "",
-        senderEmail: sender.email || "",
-        teamName: team?.name || "",
-        to: email,
-        url: verifyUrl,
-      });
+      // Check if emails are disabled
+      if (process.env.DISABLE_EMAILS === "true") {
+        console.log("Emails disabled - skipping email send for invitation");
+        console.log("Invitation URL for manual sharing:", verifyUrl);
+      } else {
+        sendTeammateInviteEmail({
+          senderName: sender.name || "",
+          senderEmail: sender.email || "",
+          teamName: team?.name || "",
+          to: email,
+          url: verifyUrl,
+        });
+      }
 
       return res.status(200).json("Invitation sent!");
     } catch (error) {

@@ -138,22 +138,29 @@ export default async function handle(
       console.log("Final verify URL:", verifyUrl);
 
       console.log("Sending invitation email to:", email);
-      console.log("About to call sendTeammateInviteEmail function");
       
-      try {
-        await sendTeammateInviteEmail({
-          senderName: sender.name || "Unknown",
-          senderEmail: sender.email || "noreply@papermark.com",
-          teamName: team?.name || "Untitled Team",
-          to: email,
-          url: verifyUrl,
-        });
-        console.log("Email sent successfully");
-      } catch (emailError) {
-        console.error("Email sending failed, but continuing:", emailError);
-        // Log the full error details
-        console.error("Email error stack:", (emailError as Error)?.stack);
-        console.error("Email error message:", (emailError as Error)?.message);
+      // Check if emails are disabled
+      if (process.env.DISABLE_EMAILS === "true") {
+        console.log("Emails disabled - skipping email send");
+        console.log("Invitation URL for manual sharing:", verifyUrl);
+      } else {
+        console.log("About to call sendTeammateInviteEmail function");
+        
+        try {
+          await sendTeammateInviteEmail({
+            senderName: sender.name || "Unknown",
+            senderEmail: sender.email || "noreply@papermark.com",
+            teamName: team?.name || "Untitled Team",
+            to: email,
+            url: verifyUrl,
+          });
+          console.log("Email sent successfully");
+        } catch (emailError) {
+          console.error("Email sending failed, but continuing:", emailError);
+          // Log the full error details
+          console.error("Email error stack:", (emailError as Error)?.stack);
+          console.error("Email error message:", (emailError as Error)?.message);
+        }
       }
 
       res.status(200).json("Invitation sent again!");
