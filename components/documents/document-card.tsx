@@ -83,8 +83,8 @@ export default function DocumentsCard({
 
   function handleCopyToClipboard(id: string) {
     copyToClipboard(
-      `${process.env.NEXT_PUBLIC_MARKETING_URL}/view/${id}`,
-      "Link copied to clipboard.",
+      `${process.env.NEXT_PUBLIC_MARKETING_URL || window.location.origin}/view/${id}`,
+      "リンクをクリップボードにコピーしました。",
     );
   }
 

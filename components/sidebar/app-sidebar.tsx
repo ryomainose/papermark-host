@@ -79,13 +79,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const data = {
     navMain: [
       {
-        title: "Dashboard",
+        title: "ダッシュボード",
         url: "/dashboard",
         icon: HouseIcon,
         current: router.pathname.includes("dashboard"),
       },
       {
-        title: "All Documents",
+        title: "すべてのドキュメント",
         url: "/documents",
         icon: FolderIcon,
         current:
@@ -93,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           !router.pathname.includes("datarooms"),
       },
       {
-        title: "All Datarooms",
+        title: "すべてのデータルーム",
         url: "/datarooms",
         icon: ServerIcon,
         current: router.pathname.includes("datarooms"),
@@ -103,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         highlightItem: ["datarooms"],
       },
       {
-        title: "Visitors",
+        title: "訪問者",
         url: "/visitors",
         icon: ContactIcon,
         current: router.pathname.includes("visitors"),
@@ -113,7 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         highlightItem: ["visitors"],
       },
       {
-        title: "Branding",
+        title: "ブランディング",
         url: "/branding",
         icon: BrushIcon,
         current:
@@ -121,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           !router.pathname.includes("datarooms"),
       },
       {
-        title: "Settings",
+        title: "設定",
         url: "/settings/general",
         icon: CogIcon,
         isActive:
