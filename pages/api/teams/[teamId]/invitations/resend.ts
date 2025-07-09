@@ -152,8 +152,8 @@ export default async function handle(
       } catch (emailError) {
         console.error("Email sending failed, but continuing:", emailError);
         // Log the full error details
-        console.error("Email error stack:", emailError.stack);
-        console.error("Email error message:", emailError.message);
+        console.error("Email error stack:", (emailError as Error)?.stack);
+        console.error("Email error message:", (emailError as Error)?.message);
       }
 
       res.status(200).json("Invitation sent again!");
@@ -161,8 +161,8 @@ export default async function handle(
     } catch (error) {
       console.error("Resend invitation error:", error);
       console.error("Error details:", {
-        message: error.message,
-        stack: error.stack,
+        message: (error as Error)?.message,
+        stack: (error as Error)?.stack,
         teamId,
         email,
       });
