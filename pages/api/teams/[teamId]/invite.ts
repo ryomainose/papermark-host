@@ -135,7 +135,7 @@ export default async function handle(
 
       // invitation acceptance URL
       const invitationUrl = `/api/teams/${teamId}/invitations/accept?token=${token}&email=${email}`;
-      const fullInvitationUrl = `${process.env.NEXT_PUBLIC_BASE_URL}${invitationUrl}`;
+      const fullInvitationUrl = `https://papermark-pi-sandy.vercel.app${invitationUrl}`;
 
       // magic link
       const magicLinkParams = new URLSearchParams({
@@ -144,7 +144,7 @@ export default async function handle(
         callbackUrl: fullInvitationUrl,
       });
 
-      const magicLink = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/callback/email?${magicLinkParams.toString()}`;
+      const magicLink = `https://papermark-pi-sandy.vercel.app/api/auth/callback/email?${magicLinkParams.toString()}`;
 
       const verifyParams = new URLSearchParams({
         verification_url: magicLink,
@@ -159,7 +159,7 @@ export default async function handle(
 
       const jwtToken = generateJWT(verifyParamsObject);
 
-      const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify/invitation?token=${jwtToken}`;
+      const verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
 
       sendTeammateInviteEmail({
         senderName: sender.name || "",
