@@ -175,7 +175,7 @@ export default function NotionForm() {
     if (!response.ok) {
       // handle error with toast message
       const { error } = await response.json();
-      toast.error(error);
+      toast.error(typeof error === 'string' ? error : error.message || 'An error occurred');
       setIsLoading(false);
       return;
     }

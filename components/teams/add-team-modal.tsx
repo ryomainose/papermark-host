@@ -52,7 +52,7 @@ export function AddTeamModal({ children, setCurrentTeam }: AddTeamModalProps) {
     if (!response.ok) {
       const error = await response.json();
       setLoading(false);
-      toast.error(error);
+      toast.error(typeof error === 'string' ? error : error.message || 'An error occurred');
       return;
     }
     const data = await response.json();

@@ -95,7 +95,7 @@ export default function Billing() {
 
     if (response.status !== 204) {
       const error = await response.json();
-      toast.error(error);
+      toast.error(typeof error === 'string' ? error : error.message || 'An error occurred');
       return;
     }
 
@@ -125,7 +125,7 @@ export default function Billing() {
 
     if (response.status !== 204) {
       const error = await response.json();
-      toast.error(error);
+      toast.error(typeof error === 'string' ? error : error.message || 'An error occurred');
       setLeavingUserId("");
       return;
     }
@@ -168,7 +168,7 @@ export default function Billing() {
 
     if (response.status !== 200) {
       const error = await response.json();
-      toast.error(error);
+      toast.error(typeof error === 'string' ? error : error.message || 'An error occurred');
       return;
     }
 
@@ -199,7 +199,7 @@ export default function Billing() {
 
     if (!response.ok) {
       const error = await response.json();
-      toast.error(error);
+      toast.error(typeof error === 'string' ? error : error.message || 'An error occurred');
       return;
     }
 

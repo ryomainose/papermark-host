@@ -74,7 +74,7 @@ export function LinkOptionContainer({
 
     if (!response.ok) {
       const { error } = await response.json();
-      toast.error(error);
+      toast.error(typeof error === 'string' ? error : error.message || 'An error occurred');
       setIsLoading(false);
       return;
     }

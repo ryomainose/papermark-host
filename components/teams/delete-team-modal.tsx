@@ -51,7 +51,7 @@ export function DeleteTeamModal({ children }: { children: React.ReactNode }) {
 
     if (response.status !== 204) {
       const error = await response.json();
-      toast.error(error);
+      toast.error(typeof error === 'string' ? error : error.message || 'An error occurred');
       setLoading(false);
       return;
     }

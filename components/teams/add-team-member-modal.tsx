@@ -66,7 +66,7 @@ export function AddTeamMembers({
       const error = await response.json();
       setLoading(false);
       setOpen(false);
-      toast.error(error);
+      toast.error(typeof error === 'string' ? error : error.message || 'An error occurred');
       return;
     }
 
