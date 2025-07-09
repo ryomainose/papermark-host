@@ -238,7 +238,7 @@ export default function Billing() {
                   Teammates that have access to this project.
                 </p>
               </div>
-              {showUpgradePlanModal && process.env.NEXT_PUBLIC_BILLING_DISABLED !== "true" ? (
+              {showUpgradePlanModal ? (
                 <UpgradePlanModal
                   clickedPlan={PlanEnum.Pro}
                   trigger={"invite_team_members"}

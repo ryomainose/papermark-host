@@ -113,7 +113,7 @@ export function TeamSwitcher({
         </DropdownMenu>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        {showUpgradePlanModal && process.env.NEXT_PUBLIC_BILLING_DISABLED !== "true" ? (
+        {showUpgradePlanModal ? (
           <UpgradePlanModal
             clickedPlan={PlanEnum.Pro}
             trigger={"invite_team_members"}

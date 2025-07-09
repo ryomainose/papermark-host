@@ -38,17 +38,12 @@ export function useLimits() {
   // Check if billing is disabled via environment variable
   // If limits are set to a very large number (999999999), it means billing is disabled
   const UNLIMITED = 999999999;
-  const billingDisabled = data?.users === UNLIMITED;
+  const billingDisabled = data?.users === UNLIMITED || process.env.NEXT_PUBLIC_BILLING_DISABLED === "true";
   
-  console.log("useLimits data:", data);
-  console.log("billingDisabled:", billingDisabled);
-  console.log("isFree:", isFree, "isTrial:", isTrial, "canAddUsers:", canAddUsers);
-  
+  // Always return false for upgrade modal if billing is disabled
   const showUpgradePlanModal = billingDisabled 
     ? false 
     : (isFree && !isTrial) || (isTrial && !canAddUsers);
-    
-  console.log("showUpgradePlanModal:", showUpgradePlanModal);
 
   return {
     showUpgradePlanModal,
