@@ -16,7 +16,15 @@ export const sendTeammateInviteEmail = async ({
   url: string;
 }) => {
   try {
-    await sendEmail({
+    console.log("Sending team invitation email with params:", {
+      to,
+      senderName,
+      senderEmail,
+      teamName,
+      url: url.substring(0, 100) + "...", // Truncate URL for logging
+    });
+    
+    const result = await sendEmail({
       to: to,
       subject: `You are invited to join team`,
       react: TeamInvitation({
@@ -28,7 +36,11 @@ export const sendTeammateInviteEmail = async ({
       test: process.env.NODE_ENV === "development",
       system: true,
     });
+    
+    console.log("Email sent successfully, result:", result);
+    return result;
   } catch (e) {
-    console.error(e);
+    console.error("Error sending team invitation email:", e);
+    throw e; // Re-throw the error so the calling function can handle it
   }
 };

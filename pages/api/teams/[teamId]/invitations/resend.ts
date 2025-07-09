@@ -60,6 +60,8 @@ export default async function handle(
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24); // invitation expires in 24 hour
 
+      console.log("Updating invitation for:", email, "in team:", teamId);
+      
       // update invitation
       const invitation = await prisma.invitation.update({
         where: {
@@ -75,6 +77,8 @@ export default async function handle(
           token: true,
         },
       });
+      
+      console.log("Invitation updated successfully, token:", invitation.token.substring(0, 10) + "...");
 
       const verificationTokenRecord = await prisma.verificationToken.findUnique(
         {
@@ -134,14 +138,23 @@ export default async function handle(
       console.log("Final verify URL:", verifyUrl);
 
       console.log("Sending invitation email to:", email);
-      await sendTeammateInviteEmail({
-        senderName: sender.name || "",
-        senderEmail: sender.email || "",
-        teamName: team?.name || "",
-        to: email,
-        url: verifyUrl,
-      });
-      console.log("Email sent successfully");
+      console.log("About to call sendTeammateInviteEmail function");
+      
+      try {
+        await sendTeammateInviteEmail({
+          senderName: sender.name || "Unknown",
+          senderEmail: sender.email || "noreply@papermark.com",
+          teamName: team?.name || "Untitled Team",
+          to: email,
+          url: verifyUrl,
+        });
+        console.log("Email sent successfully");
+      } catch (emailError) {
+        console.error("Email sending failed, but continuing:", emailError);
+        // Log the full error details
+        console.error("Email error stack:", emailError.stack);
+        console.error("Email error message:", emailError.message);
+      }
 
       res.status(200).json("Invitation sent again!");
       return;
