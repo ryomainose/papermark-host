@@ -19,6 +19,15 @@ export default async function handle(
       return res.status(401).end("Unauthorized");
     }
 
+    // If billing is disabled, return premium plan to avoid upgrade prompts
+    if (process.env.BILLING_DISABLED === "true") {
+      return res.status(200).json({
+        plan: "business",
+        isCustomer: true,
+        subscriptionCycle: "yearly",
+      });
+    }
+
     const { teamId } = req.query as { teamId: string };
     const userId = (session.user as CustomUser).id;
 
