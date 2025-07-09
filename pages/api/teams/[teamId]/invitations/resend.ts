@@ -126,21 +126,33 @@ export default async function handle(
 
       const verifyParamsObject = Object.fromEntries(verifyParams.entries());
 
+      console.log("Generating JWT with params:", verifyParamsObject);
       const jwtToken = generateJWT(verifyParamsObject);
+      console.log("Generated JWT token:", jwtToken);
 
       const verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
+      console.log("Final verify URL:", verifyUrl);
 
-      sendTeammateInviteEmail({
+      console.log("Sending invitation email to:", email);
+      await sendTeammateInviteEmail({
         senderName: sender.name || "",
         senderEmail: sender.email || "",
         teamName: team?.name || "",
         to: email,
         url: verifyUrl,
       });
+      console.log("Email sent successfully");
 
       res.status(200).json("Invitation sent again!");
       return;
     } catch (error) {
+      console.error("Resend invitation error:", error);
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+        teamId,
+        email,
+      });
       errorhandler(error, res);
     }
   }
