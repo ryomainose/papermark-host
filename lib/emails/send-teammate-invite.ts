@@ -26,6 +26,8 @@ export const sendTeammateInviteEmail = async ({
     
     // For testing with free Resend account, override recipient
     const testEmail = process.env.RESEND_TEST_EMAIL || to;
+    console.log("RESEND_TEST_EMAIL env var:", process.env.RESEND_TEST_EMAIL);
+    console.log("Using email address:", testEmail);
     
     const result = await sendEmail({
       to: testEmail,
