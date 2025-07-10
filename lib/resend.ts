@@ -37,8 +37,15 @@ export const sendEmail = async ({
   unsubscribeUrl?: string;
 }) => {
   if (!resend) {
-    // Throw an error if resend is not initialized
-    throw new Error("Resend not initialized");
+    // Log warning and return mock success when resend is not available
+    console.warn("Resend not initialized - RESEND_API_KEY not set. Email sending disabled.");
+    return {
+      id: "mock-email-id",
+      from: from || "noreply@papermark.io",
+      to,
+      subject,
+      created_at: new Date().toISOString(),
+    };
   }
 
   const plainText = await render(react, { plainText: true });
