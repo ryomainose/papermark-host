@@ -28,26 +28,36 @@ export default async function handle(
     const { email } = req.body as { email: string };
 
     try {
+      console.log("=== RESEND INVITATION START ===");
+      console.log("Request params:", { teamId, email });
+      console.log("User ID:", (session.user as CustomUser).id);
+
       // check if currentUser is part of the team with the teamId
+      console.log("Checking user team membership...");
       const userTeam = await prisma.userTeam.findFirst({
         where: {
           teamId,
           userId: (session.user as CustomUser).id,
         },
       });
+      console.log("User team result:", userTeam);
 
       if (!userTeam) {
+        console.log("User not part of team, returning 403");
         res.status(403).json("You are not part of this team");
         return;
       }
 
       const isUserAdmin = userTeam.role === "ADMIN";
+      console.log("User admin status:", isUserAdmin);
       if (!isUserAdmin) {
+        console.log("User not admin, returning 403");
         res.status(403).json("Only admins can resend the invitation!");
         return;
       }
 
       // get current team
+      console.log("Fetching team details...");
       const team = await prisma.team.findUnique({
         where: {
           id: teamId,
@@ -56,6 +66,7 @@ export default async function handle(
           name: true,
         },
       });
+      console.log("Team details:", team);
 
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24); // invitation expires in 24 hour
@@ -63,94 +74,112 @@ export default async function handle(
       console.log("Updating invitation for:", email, "in team:", teamId);
       
       // update invitation
-      const invitation = await prisma.invitation.update({
-        where: {
-          email_teamId: {
-            email: email,
-            teamId: teamId,
+      try {
+        const invitation = await prisma.invitation.update({
+          where: {
+            email_teamId: {
+              email: email,
+              teamId: teamId,
+            },
           },
-        },
-        data: {
-          expires: expiresAt,
-        },
-        select: {
-          token: true,
-        },
-      });
-      
-      console.log("Invitation updated successfully, token:", invitation.token.substring(0, 10) + "...");
-
-      const verificationTokenRecord = await prisma.verificationToken.findUnique(
-        {
-          where: { token: hashToken(invitation.token) },
-        },
-      );
-
-      if (!verificationTokenRecord) {
-        await prisma.verificationToken.create({
-          data: {
-            expires: expiresAt,
-            token: hashToken(invitation.token),
-            identifier: email,
-          },
-        });
-      } else {
-        await prisma.verificationToken.update({
-          where: { token: hashToken(invitation.token) },
           data: {
             expires: expiresAt,
           },
+          select: {
+            token: true,
+          },
         });
+        console.log("Invitation updated successfully, token:", invitation.token.substring(0, 10) + "...");
+
+        console.log("Managing verification token...");
+        const verificationTokenRecord = await prisma.verificationToken.findUnique(
+          {
+            where: { token: hashToken(invitation.token) },
+          },
+        );
+
+        if (!verificationTokenRecord) {
+          console.log("Creating new verification token...");
+          await prisma.verificationToken.create({
+            data: {
+              expires: expiresAt,
+              token: hashToken(invitation.token),
+              identifier: email,
+            },
+          });
+        } else {
+          console.log("Updating existing verification token...");
+          await prisma.verificationToken.update({
+            where: { token: hashToken(invitation.token) },
+            data: {
+              expires: expiresAt,
+            },
+          });
+        }
+
+        // send invite email
+        const sender = session.user as CustomUser;
+        console.log("Sender details:", { name: sender.name, email: sender.email });
+
+        // invitation acceptance URL
+        const invitationUrl = `/api/teams/${teamId}/invitations/accept?token=${invitation.token}&email=${email}`;
+        const fullInvitationUrl = `https://papermark-pi-sandy.vercel.app${invitationUrl}`;
+
+        // magic link
+        const magicLinkParams = new URLSearchParams({
+          email,
+          token: invitation.token,
+          callbackUrl: fullInvitationUrl,
+        });
+
+        const magicLink = `https://papermark-pi-sandy.vercel.app/api/auth/callback/email?${magicLinkParams.toString()}`;
+
+        const verifyParams = new URLSearchParams({
+          verification_url: magicLink,
+          email,
+          token: invitation.token,
+          teamId,
+          type: "invitation",
+          expiresAt: expiresAt.toISOString(),
+        });
+
+        const verifyParamsObject = Object.fromEntries(verifyParams.entries());
+
+        console.log("Generating JWT with params:", verifyParamsObject);
+        const jwtToken = generateJWT(verifyParamsObject);
+        console.log("Generated JWT token:", jwtToken ? "SUCCESS" : "FAILED");
+
+        const verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
+        console.log("Final verify URL:", verifyUrl.substring(0, 100) + "...");
+
+        console.log("Sending invitation email to:", email);
+        
+        try {
+          await sendTeammateInviteEmail({
+            senderName: sender.name || sender.email || "Team Member",
+            senderEmail: sender.email || "noreply@papermark.io",
+            teamName: team?.name || "the team",
+            to: email,
+            url: verifyUrl,
+          });
+          console.log("Email sent successfully to:", email);
+        } catch (emailError) {
+          console.error("Email sending failed:", emailError);
+          // Continue execution even if email fails
+        }
+
+        console.log("=== RESEND INVITATION SUCCESS ===");
+        res.status(200).json("Invitation sent again!");
+        return;
+
+      } catch (invitationError) {
+        console.error("Invitation update failed:", invitationError);
+        if (invitationError.code === 'P2025') {
+          res.status(404).json("Invitation not found for this email");
+          return;
+        }
+        throw invitationError;
       }
-
-      // send invite email
-      const sender = session.user as CustomUser;
-
-      // invitation acceptance URL
-      const invitationUrl = `/api/teams/${teamId}/invitations/accept?token=${invitation.token}&email=${email}`;
-      const fullInvitationUrl = `https://papermark-pi-sandy.vercel.app${invitationUrl}`;
-
-      // magic link
-      const magicLinkParams = new URLSearchParams({
-        email,
-        token: invitation.token,
-        callbackUrl: fullInvitationUrl,
-      });
-
-      const magicLink = `https://papermark-pi-sandy.vercel.app/api/auth/callback/email?${magicLinkParams.toString()}`;
-
-      const verifyParams = new URLSearchParams({
-        verification_url: magicLink,
-        email,
-        token: invitation.token,
-        teamId,
-        type: "invitation",
-        expiresAt: expiresAt.toISOString(),
-      });
-
-      const verifyParamsObject = Object.fromEntries(verifyParams.entries());
-
-      console.log("Generating JWT with params:", verifyParamsObject);
-      const jwtToken = generateJWT(verifyParamsObject);
-      console.log("Generated JWT token:", jwtToken);
-
-      const verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
-      console.log("Final verify URL:", verifyUrl);
-
-      console.log("Sending invitation email to:", email);
-      
-      await sendTeammateInviteEmail({
-        senderName: sender.name || sender.email || "Team Member",
-        senderEmail: sender.email || "noreply@papermark.io",
-        teamName: team?.name || "the team",
-        to: email,
-        url: verifyUrl,
-      });
-      
-      console.log("Email sent successfully to:", email);
-
-      res.status(200).json("Invitation sent again!");
-      return;
     } catch (error) {
       console.error("Resend invitation error:", error);
       console.error("Error details:", {
