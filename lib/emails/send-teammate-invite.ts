@@ -24,8 +24,11 @@ export const sendTeammateInviteEmail = async ({
       url: url.substring(0, 100) + "...", // Truncate URL for logging
     });
     
+    // For testing with free Resend account, override recipient
+    const testEmail = process.env.RESEND_TEST_EMAIL || to;
+    
     const result = await sendEmail({
-      to: to,
+      to: testEmail,
       subject: `You are invited to join team`,
       react: TeamInvitation({
         senderName,
@@ -33,7 +36,7 @@ export const sendTeammateInviteEmail = async ({
         teamName,
         url,
       }),
-      test: process.env.NODE_ENV === "development",
+      test: process.env.NODE_ENV === "development" || process.env.RESEND_TEST_MODE === "true",
       system: true,
     });
     
