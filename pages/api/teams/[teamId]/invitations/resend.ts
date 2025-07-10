@@ -139,23 +139,10 @@ export default async function handle(
 
       console.log("Sending invitation email to:", email);
       
-      console.log("About to call sendTeammateInviteEmail function");
-      
-      try {
-        await sendTeammateInviteEmail({
-          senderName: sender.name || "Unknown",
-          senderEmail: sender.email || "noreply@papermark.com",
-          teamName: team?.name || "Untitled Team",
-          to: email,
-          url: verifyUrl,
-        });
-        console.log("Email sent successfully");
-      } catch (emailError) {
-        console.error("Email sending failed, but continuing:", emailError);
-        // Log the full error details
-        console.error("Email error stack:", (emailError as Error)?.stack);
-        console.error("Email error message:", (emailError as Error)?.message);
-      }
+      // Temporarily skip email to test if API works without Resend
+      console.log("Skipping email temporarily for debugging");
+      console.log("Invitation URL:", verifyUrl);
+      console.log("Would send email to:", email, "from:", sender.name);
 
       res.status(200).json("Invitation sent again!");
       return;

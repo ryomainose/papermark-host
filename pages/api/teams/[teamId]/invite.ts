@@ -161,13 +161,10 @@ export default async function handle(
 
       const verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
 
-      await sendTeammateInviteEmail({
-        senderName: sender.name || "",
-        senderEmail: sender.email || "",
-        teamName: team?.name || "",
-        to: email,
-        url: verifyUrl,
-      });
+      // Temporarily skip email to test if API works without Resend
+      console.log("Skipping email temporarily for debugging");
+      console.log("Invitation URL:", verifyUrl);
+      console.log("Would send email to:", email);
 
       return res.status(200).json("Invitation sent!");
     } catch (error) {
