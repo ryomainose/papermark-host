@@ -139,10 +139,15 @@ export default async function handle(
 
       console.log("Sending invitation email to:", email);
       
-      // Temporarily skip email to test if API works without Resend
-      console.log("Skipping email temporarily for debugging");
-      console.log("Invitation URL:", verifyUrl);
-      console.log("Would send email to:", email, "from:", sender.name);
+      await sendTeammateInviteEmail({
+        senderName: sender.name || sender.email || "Team Member",
+        senderEmail: sender.email,
+        teamName: team?.name || "the team",
+        to: email,
+        url: verifyUrl,
+      });
+      
+      console.log("Email sent successfully to:", email);
 
       res.status(200).json("Invitation sent again!");
       return;
