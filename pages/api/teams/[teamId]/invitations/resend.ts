@@ -172,9 +172,9 @@ export default async function handle(
         res.status(200).json("Invitation sent again!");
         return;
 
-      } catch (invitationError) {
+      } catch (invitationError: any) {
         console.error("Invitation update failed:", invitationError);
-        if (invitationError.code === 'P2025') {
+        if (invitationError?.code === 'P2025') {
           res.status(404).json("Invitation not found for this email");
           return;
         }
