@@ -141,7 +141,7 @@ export default async function handle(
       
       await sendTeammateInviteEmail({
         senderName: sender.name || sender.email || "Team Member",
-        senderEmail: sender.email,
+        senderEmail: sender.email || "noreply@papermark.io",
         teamName: team?.name || "the team",
         to: email,
         url: verifyUrl,
