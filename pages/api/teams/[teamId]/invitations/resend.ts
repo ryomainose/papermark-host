@@ -17,15 +17,27 @@ export default async function handle(
 ) {
   if (req.method === "PUT") {
     // PUT /api/teams/:teamId/invitations/resend
-    const session = await getServerSession(req, res, authOptions);
+    let session;
+    try {
+      session = await getServerSession(req, res, authOptions);
+    } catch (error) {
+      console.error("Session error:", error);
+      res.status(500).json({ error: "Session error" });
+      return;
+    }
+    
     if (!session) {
       res.status(401).end("Unauhorized");
       return;
     }
 
     const { teamId } = req.query as { teamId: string };
-
     const { email } = req.body as { email: string };
+
+    if (!teamId || !email) {
+      res.status(400).json({ error: "Missing required parameters" });
+      return;
+    }
 
     try {
       console.log("=== RESEND INVITATION START ===");
@@ -146,11 +158,20 @@ export default async function handle(
         const verifyParamsObject = Object.fromEntries(verifyParams.entries());
 
         console.log("Generating JWT with params:", verifyParamsObject);
-        const jwtToken = generateJWT(verifyParamsObject);
-        console.log("Generated JWT token:", jwtToken ? "SUCCESS" : "FAILED");
-
-        const verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
-        console.log("Final verify URL:", verifyUrl.substring(0, 100) + "...");
+        let jwtToken;
+        let verifyUrl;
+        
+        try {
+          jwtToken = generateJWT(verifyParamsObject);
+          console.log("Generated JWT token:", jwtToken ? "SUCCESS" : "FAILED");
+          verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
+          console.log("Final verify URL:", verifyUrl.substring(0, 100) + "...");
+        } catch (jwtError) {
+          console.error("JWT generation failed:", jwtError);
+          // Use a simpler URL without JWT if generation fails
+          verifyUrl = fullInvitationUrl;
+          console.log("Using fallback URL:", verifyUrl);
+        }
 
         console.log("Sending invitation email to:", email);
         
@@ -181,6 +202,7 @@ export default async function handle(
         throw invitationError;
       }
     } catch (error) {
+      console.error("=== RESEND INVITATION ERROR ===");
       console.error("Resend invitation error:", error);
       console.error("Error details:", {
         message: (error as Error)?.message,
@@ -188,7 +210,18 @@ export default async function handle(
         teamId,
         email,
       });
-      errorhandler(error, res);
+      
+      // Always return a response to prevent 500 errors
+      if (!res.headersSent) {
+        res.status(500).json({ 
+          error: "Failed to resend invitation",
+          message: (error as Error)?.message || "Unknown error"
+        });
+      }
     }
+  } else {
+    // Method not allowed
+    res.setHeader('Allow', ['PUT']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
