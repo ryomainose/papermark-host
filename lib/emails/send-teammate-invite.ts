@@ -29,8 +29,13 @@ export const sendTeammateInviteEmail = async ({
     console.log("RESEND_TEST_EMAIL env var:", process.env.RESEND_TEST_EMAIL);
     console.log("Using email address:", testEmail);
     
+    // If using test mode, emails go to Resend's test inbox
+    const isTestMode = process.env.RESEND_TEST_MODE === "true";
+    const finalEmail = isTestMode ? "delivered@resend.dev" : testEmail;
+    console.log("Test mode:", isTestMode, "Final recipient:", finalEmail);
+    
     const result = await sendEmail({
-      to: testEmail,
+      to: finalEmail,
       subject: `You are invited to join team`,
       react: TeamInvitation({
         senderName,
