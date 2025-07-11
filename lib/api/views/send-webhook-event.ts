@@ -27,14 +27,16 @@ export async function sendLinkViewWebhook({
       select: { plan: true },
     });
 
-    if (
-      team?.plan === "free" ||
-      team?.plan === "pro" ||
-      team?.plan.includes("trial")
-    ) {
-      // team is not on paid plan, so we don't need to send webhooks
-      return;
-    }
+    // Temporarily allow webhooks for all plans for testing
+    // TODO: Re-enable plan restrictions for production
+    // if (
+    //   team?.plan === "free" ||
+    //   team?.plan === "pro" ||
+    //   team?.plan.includes("trial")
+    // ) {
+    //   // team is not on paid plan, so we don't need to send webhooks
+    //   return;
+    // }
 
     // Get webhooks for team
     const webhooks = await prisma.webhook.findMany({

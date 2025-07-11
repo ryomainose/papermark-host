@@ -39,7 +39,8 @@ export default function WebhookSettings() {
             <div className="space-y-1">
               <h3 className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-foreground">
                 Webhooks{" "}
-                {isFree || isPro ? <PlanBadge plan="Business" /> : null}
+                {/* Temporarily removed plan restriction for testing */}
+                {/* {isFree || isPro ? <PlanBadge plan="Business" /> : null} */}
               </h3>
               <p className="flex flex-row items-center gap-2 text-sm text-muted-foreground">
                 Send data to external services when events happen in Papermark
