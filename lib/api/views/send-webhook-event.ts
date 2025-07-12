@@ -66,13 +66,16 @@ export async function sendLinkViewWebhook({
     }
 
     // Get link information
+    console.log("🔍 Looking for link:", linkId, "in team:", teamId);
     const link = await prisma.link.findUnique({
       where: { id: linkId, teamId },
     });
 
     if (!link) {
+      console.log("❌ Link not found:", linkId);
       throw new Error("Link not found");
     }
+    console.log("✅ Link found:", link.name);
 
     // Prepare link data for webhook
     const linkData = {
@@ -198,6 +201,7 @@ export async function sendLinkViewWebhook({
     }
     return;
   } catch (error) {
+    console.log("💥 Error in webhook send:", error);
     log({
       message: `Error sending webhooks for link view: ${error}`,
       type: "error",
