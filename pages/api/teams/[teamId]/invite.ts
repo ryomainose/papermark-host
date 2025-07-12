@@ -34,6 +34,8 @@ export default async function handle(
     }
 
     try {
+      console.log("Starting invitation process for:", { email, teamId });
+      
       const team = await prisma.team.findUnique({
         where: {
           id: teamId,
@@ -54,9 +56,12 @@ export default async function handle(
       });
 
       if (!team) {
+        console.log("Team not found:", teamId);
         res.status(404).json("Team not found");
         return;
       }
+      
+      console.log("Team found:", team.id, "with", team.users.length, "users");
 
       // check that the user is admin of the team, otherwise return 403
       const teamUsers = team.users;
@@ -66,15 +71,20 @@ export default async function handle(
           user.userId === (session.user as CustomUser).id,
       );
       if (!isUserAdmin) {
+        console.log("User is not admin:", (session.user as CustomUser).id);
         res.status(403).json("Only admins can send the invitation!");
         return;
       }
+      
+      console.log("User is admin, proceeding with invitation");
 
       // Check if the user has reached the limit of users in the team
+      console.log("Checking limits...");
       const limits = await getLimits({
         teamId,
         userId: (session.user as CustomUser).id,
       });
+      console.log("Limits retrieved:", limits);
 
       if (limits && teamUsers.length >= limits.users) {
         res
@@ -104,15 +114,21 @@ export default async function handle(
       });
 
       if (invitationExists) {
+        console.log("Invitation already exists for:", email);
         res.status(400).json("Invitation already sent to this email");
         return;
       }
+      
+      console.log("No existing invitation found, creating new one...");
 
       const token = newId("inv");
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24); // invitation expires in 24 hour
+      
+      console.log("Generated token and expiry:", { token: token.substring(0, 10) + "...", expiresAt });
 
       // create invitation
+      console.log("Creating invitation record...");
       await prisma.invitation.create({
         data: {
           email,
@@ -122,6 +138,7 @@ export default async function handle(
         },
       });
 
+      console.log("Creating verification token...");
       await prisma.verificationToken.create({
         data: {
           token: hashToken(token),
@@ -157,15 +174,23 @@ export default async function handle(
 
       const verifyParamsObject = Object.fromEntries(verifyParams.entries());
 
+      console.log("Generating JWT with params:", verifyParamsObject);
       const jwtToken = generateJWT(verifyParamsObject);
+      console.log("Generated JWT token:", jwtToken ? "SUCCESS" : "FAILED");
 
       const verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
 
-      // Temporarily skip email to test if API works without Resend
-      console.log("Skipping email temporarily for debugging");
-      console.log("Invitation URL:", verifyUrl);
-      console.log("Would send email to:", email);
+      await sendTeammateInviteEmail({
+        senderName: sender.name || sender.email,
+        senderEmail: sender.email,
+        teamName: team?.name || "the team",
+        to: email,
+        url: verifyUrl,
+      });
+      
+      console.log("Email sent successfully to:", email);
 
+      console.log("Invitation process completed successfully");
       return res.status(200).json("Invitation sent!");
     } catch (error) {
       errorhandler(error, res);
