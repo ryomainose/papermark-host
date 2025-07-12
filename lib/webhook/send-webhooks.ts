@@ -50,14 +50,29 @@ const publishWebhookEventToQStash = async ({
   // Format payload for Slack webhooks
   let body: any = payload;
   if (webhook.url.includes("slack.com")) {
-    // Format for Slack incoming webhooks
-    const linkName = payload.data.link?.name || "Document";
-    const viewerEmail = payload.data.view?.email || "Someone";
-    const viewedAt = new Date(payload.data.view?.viewedAt).toLocaleString();
+    // Format for Slack incoming webhooks based on event type
+    let text = "";
     
-    body = {
-      text: `📄 Document viewed!\n*Document:* ${linkName}\n*Viewer:* ${viewerEmail}\n*Time:* ${viewedAt}`
-    };
+    if (payload.event === "link.viewed" && "link" in payload.data) {
+      const linkName = payload.data.link?.name || "Document";
+      const viewerEmail = payload.data.view?.email || "Someone";
+      const viewedAt = new Date(payload.data.view?.viewedAt).toLocaleString();
+      text = `📄 Document viewed!\n*Document:* ${linkName}\n*Viewer:* ${viewerEmail}\n*Time:* ${viewedAt}`;
+    } else if (payload.event === "link.created" && "link" in payload.data) {
+      const linkName = payload.data.link?.name || "Document";
+      text = `🔗 New link created!\n*Document:* ${linkName}`;
+    } else if (payload.event === "document.created" && "document" in payload.data) {
+      const docName = payload.data.document?.name || "Untitled";
+      text = `📑 New document uploaded!\n*Name:* ${docName}`;
+    } else if (payload.event === "dataroom.created" && "dataroom" in payload.data) {
+      const dataroomName = payload.data.dataroom?.name || "Untitled";
+      text = `🗂️ New dataroom created!\n*Name:* ${dataroomName}`;
+    } else {
+      // Fallback for unknown events
+      text = `Event: ${payload.event}`;
+    }
+    
+    body = { text };
   }
 
   const response = await qstash.publishJSON({
