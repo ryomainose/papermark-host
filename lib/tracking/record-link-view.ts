@@ -100,9 +100,13 @@ export async function recordLinkView({
     city: geo.city || "Unknown",
   };
 
-  const [, ,] = await Promise.all([
+  // Run operations independently to prevent one failure from blocking others
+  const results = await Promise.allSettled([
     // record link view in Tinybird
-    recordLinkViewTB(clickData),
+    recordLinkViewTB(clickData).catch((error) => {
+      console.error("Failed to record in Tinybird:", error);
+      return null;
+    }),
 
     // send email notification
     enableNotification ? sendNotification({ viewId, locationData }) : null,
@@ -111,8 +115,19 @@ export async function recordLinkView({
     sendLinkViewWebhook({
       teamId,
       clickData,
+    }).catch((error) => {
+      console.error("Failed to send webhook:", error);
+      return null;
     }),
   ]);
+
+  // Log any failures for debugging
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      const operations = ['Tinybird recording', 'Email notification', 'Webhook'];
+      console.error(`${operations[index]} failed:`, result.reason);
+    }
+  });
 
   return clickData;
 }
