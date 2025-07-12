@@ -108,26 +108,40 @@ export default async function handle(
         _count: { type: true },
       });
 
-      const duration = await getTotalAvgPageDuration({
-        documentId: docId,
-        excludedLinkIds: "",
-        excludedViewIds: allExcludedViews.map((view) => view.id).join(","),
-        since: 0,
-      });
+      let duration;
+      try {
+        duration = await getTotalAvgPageDuration({
+          documentId: docId,
+          excludedLinkIds: "",
+          excludedViewIds: allExcludedViews.map((view) => view.id).join(","),
+          since: 0,
+        });
+      } catch (error) {
+        console.warn(`Failed to get average page duration for document ${docId}:`, error);
+        duration = { data: [] };
+      }
 
-      const totalDocumentDuration = await getTotalDocumentDuration({
-        documentId: docId,
-        excludedLinkIds: "",
-        excludedViewIds: allExcludedViews.map((view) => view.id).join(","),
-        since: 0,
-      });
+      let totalDocumentDuration;
+      try {
+        totalDocumentDuration = await getTotalDocumentDuration({
+          documentId: docId,
+          excludedLinkIds: "",
+          excludedViewIds: allExcludedViews.map((view) => view.id).join(","),
+          since: 0,
+        });
+      } catch (error) {
+        console.warn(`Failed to get total document duration for document ${docId}:`, error);
+        totalDocumentDuration = { data: [{ sum_duration: 0 }] };
+      }
 
       const stats = {
         views: filteredViews,
         duration,
         total_duration:
-          (totalDocumentDuration.data[0].sum_duration * 1.0) /
-          filteredViews.length,
+          totalDocumentDuration.data.length > 0
+            ? (totalDocumentDuration.data[0].sum_duration * 1.0) /
+              filteredViews.length
+            : 0,
         groupedReactions,
         totalViews: filteredViews.length,
       };

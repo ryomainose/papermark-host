@@ -95,12 +95,17 @@ export default async function handle(
           ? views.slice(0, LIMITS.views)
           : views;
 
-      const durationsPromises = limitedViews.map((view) => {
-        return getViewPageDuration({
-          documentId: view.documentId!,
-          viewId: view.id,
-          since: 0,
-        });
+      const durationsPromises = limitedViews.map(async (view) => {
+        try {
+          return await getViewPageDuration({
+            documentId: view.documentId!,
+            viewId: view.id,
+            since: 0,
+          });
+        } catch (error) {
+          console.warn(`Failed to get page duration for view ${view.id}:`, error);
+          return { data: [] };
+        }
       });
 
       const durations = await Promise.all(durationsPromises);

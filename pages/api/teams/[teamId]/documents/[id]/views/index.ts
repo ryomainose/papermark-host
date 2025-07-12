@@ -131,12 +131,18 @@ async function getVideoViews(
 }
 
 async function getDocumentViews(views: ViewWithExtras[], document: Document) {
-  const durationsPromises = views.map((view) => {
-    return getViewPageDuration({
-      documentId: document.id,
-      viewId: view.id,
-      since: 0,
-    });
+  const durationsPromises = views.map(async (view) => {
+    try {
+      return await getViewPageDuration({
+        documentId: document.id,
+        viewId: view.id,
+        since: 0,
+      });
+    } catch (error) {
+      console.warn(`Failed to get page duration for view ${view.id}:`, error);
+      // Return empty data if Tinybird fails
+      return { data: [] };
+    }
   });
 
   const durations = await Promise.all(durationsPromises);
@@ -288,9 +294,15 @@ export default async function handle(
 
       let viewsWithDuration;
       if (document.type === "video") {
-        const videoEvents = await getVideoEventsByDocument({
-          document_id: docId,
-        });
+        let videoEvents;
+        try {
+          videoEvents = await getVideoEventsByDocument({
+            document_id: docId,
+          });
+        } catch (error) {
+          console.warn(`Failed to get video events for document ${docId}:`, error);
+          videoEvents = { data: [] };
+        }
         viewsWithDuration = await getVideoViews(
           limitedViews,
           document,
