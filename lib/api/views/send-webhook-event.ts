@@ -27,6 +27,8 @@ export async function sendLinkViewWebhook({
       select: { plan: true },
     });
 
+    console.log("🚀 Starting webhook send process for team:", teamId, "link:", linkId);
+    
     // Temporarily allow webhooks for all plans for testing
     // TODO: Re-enable plan restrictions for production
     // if (
@@ -53,8 +55,13 @@ export async function sendLinkViewWebhook({
       },
     });
 
+    console.log("📋 Found webhooks for team:", webhooks.length, "webhooks");
+    if (webhooks.length > 0) {
+      console.log("🔗 Webhook URLs:", webhooks.map(w => w.url));
+    }
+
     if (!webhooks || (webhooks && webhooks.length === 0)) {
-      // No webhooks for team, so we don't need to send webhooks
+      console.log("❌ No webhooks found for team, skipping webhook send");
       return;
     }
 
@@ -181,11 +188,13 @@ export async function sendLinkViewWebhook({
 
     // Send webhooks
     if (webhooks.length > 0) {
+      console.log("✅ Sending webhooks to", webhooks.length, "endpoints");
       await sendWebhooks({
         webhooks,
         trigger: "link.viewed",
         data: webhookData,
       });
+      console.log("🎉 Webhooks sent successfully!");
     }
     return;
   } catch (error) {
