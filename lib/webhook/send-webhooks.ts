@@ -47,9 +47,22 @@ const publishWebhookEventToQStash = async ({
 
   const signature = await createWebhookSignature(webhook.secret, payload);
 
+  // Format payload for Slack webhooks
+  let body: any = payload;
+  if (webhook.url.includes("slack.com")) {
+    // Format for Slack incoming webhooks
+    const linkName = payload.data.link?.name || "Document";
+    const viewerEmail = payload.data.view?.email || "Someone";
+    const viewedAt = new Date(payload.data.view?.viewedAt).toLocaleString();
+    
+    body = {
+      text: `📄 Document viewed!\n*Document:* ${linkName}\n*Viewer:* ${viewerEmail}\n*Time:* ${viewedAt}`
+    };
+  }
+
   const response = await qstash.publishJSON({
     url: webhook.url,
-    body: payload,
+    body: body,
     headers: {
       "X-Papermark-Signature": signature,
       "Upstash-Hide-Headers": "true",
