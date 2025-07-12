@@ -57,11 +57,17 @@ const publishWebhookEventToQStash = async ({
       const linkName = payload.data.link?.name || "Document";
       const viewerEmail = payload.data.view?.email || "Someone";
       const viewedAt = new Date(payload.data.view?.viewedAt).toLocaleString();
-      const documentUrl = payload.data.link?.url;
+      const documentId = payload.data.document?.id || payload.data.dataroom?.id;
+      const documentUrl = documentId 
+        ? `${process.env.NEXT_PUBLIC_MARKETING_URL}/documents/${documentId}`
+        : payload.data.link?.url;
       text = `📄 Document viewed!\n*Document:* ${linkName}\n*Viewer:* ${viewerEmail}\n*Time:* ${viewedAt}\n*URL:* ${documentUrl}`;
     } else if (payload.event === "link.created" && "link" in payload.data) {
       const linkName = payload.data.link?.name || "Document";
-      const documentUrl = payload.data.link?.url;
+      const documentId = payload.data.document?.id || payload.data.dataroom?.id;
+      const documentUrl = documentId 
+        ? `${process.env.NEXT_PUBLIC_MARKETING_URL}/documents/${documentId}`
+        : payload.data.link?.url;
       text = `🔗 New link created!\n*Document:* ${linkName}\n*URL:* ${documentUrl}`;
     } else if (payload.event === "document.created" && "document" in payload.data) {
       const docName = payload.data.document?.name || "Untitled";
