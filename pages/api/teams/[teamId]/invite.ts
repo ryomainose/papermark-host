@@ -181,8 +181,8 @@ export default async function handle(
       const verifyUrl = `https://papermark-pi-sandy.vercel.app/verify/invitation?token=${jwtToken}`;
 
       await sendTeammateInviteEmail({
-        senderName: sender.name || sender.email,
-        senderEmail: sender.email,
+        senderName: sender.name || sender.email || "Unknown",
+        senderEmail: sender.email || "",
         teamName: team?.name || "the team",
         to: email,
         url: verifyUrl,
