@@ -65,11 +65,19 @@ export default async function handler(
             "application/pdf",
             "application/vnd.ms-excel",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "text/plain",
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
           ],
-          maximumSizeInBytes: maxSize, // 30 MB
+          maximumSizeInBytes: maxSize,
           metadata: JSON.stringify({
             // optional, sent to your server on upload completion
             userId: (session.user as CustomUser).id,
+            uploadedAt: new Date().toISOString(),
           }),
         };
         

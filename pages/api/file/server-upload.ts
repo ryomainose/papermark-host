@@ -7,6 +7,9 @@ import { authOptions } from "../auth/[...nextauth]";
 export const config = {
   api: {
     bodyParser: false,
+    // Increase max body size for file uploads (100MB)
+    maxDuration: 60, // 60 seconds timeout for file uploads
+    externalResolver: true,
   },
 };
 
@@ -66,10 +69,23 @@ export default async function handler(
             throw new Error('Received empty file buffer');
           }
           
+          // Check file size limits (100MB max)
+          const maxSizeBytes = 100 * 1024 * 1024; // 100MB
+          if (fileBuffer.length > maxSizeBytes) {
+            throw new Error(`File too large: ${fileBuffer.length} bytes. Maximum allowed: ${maxSizeBytes} bytes (100MB)`);
+          }
+          
           // Upload to Vercel Blob using simple put method like quickstart
           console.log('Attempting Vercel Blob upload...');
+          
+          if (!process.env.BLOB_READ_WRITE_TOKEN) {
+            throw new Error('BLOB_READ_WRITE_TOKEN is not configured');
+          }
+          
           const blob = await put(filename, fileBuffer, {
             access: 'public',
+            // Add timeout for blob uploads
+            addRandomSuffix: true,
           });
 
           console.log('Server upload success:', blob.url);

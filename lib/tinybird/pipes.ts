@@ -15,22 +15,38 @@ const mockPipe = (pipeName: string) => async (params: any) => {
   return { data: [] };
 };
 
-export const getTotalAvgPageDuration = tb 
-  ? tb.buildPipe({
-      pipe: "get_total_average_page_duration__v5",
-      parameters: z.object({
-        documentId: z.string(),
-        excludedLinkIds: z.string().describe("Comma separated linkIds"),
-        excludedViewIds: z.string().describe("Comma separated viewIds"),
-        since: z.number(),
-      }),
-      data: z.object({
-        versionNumber: z.number().int(),
-        pageNumber: z.string(),
-        avg_duration: z.number(),
-      }),
-    })
-  : mockPipe("get_total_average_page_duration__v5");
+// Enhanced error handling for Tinybird API calls
+const createTinybirdPipe = (pipeConfig: any, pipeName: string) => {
+  if (!tb) return mockPipe(pipeName);
+  
+  const originalPipe = tb.buildPipe(pipeConfig);
+  return async (params: any) => {
+    try {
+      return await originalPipe(params);
+    } catch (error) {
+      console.error(`Tinybird ${pipeName} error:`, error);
+      if (error instanceof Error && error.message.includes('Unauthorized')) {
+        console.error('Tinybird token may be invalid or expired. Please check TINYBIRD_TOKEN environment variable.');
+      }
+      return { data: [] };
+    }
+  };
+};
+
+export const getTotalAvgPageDuration = createTinybirdPipe({
+  pipe: "get_total_average_page_duration__v5",
+  parameters: z.object({
+    documentId: z.string(),
+    excludedLinkIds: z.string().describe("Comma separated linkIds"),
+    excludedViewIds: z.string().describe("Comma separated viewIds"),
+    since: z.number(),
+  }),
+  data: z.object({
+    versionNumber: z.number().int(),
+    pageNumber: z.string(),
+    avg_duration: z.number(),
+  }),
+}, "get_total_average_page_duration__v5");
 
 export const getViewPageDuration = tb 
   ? tb.buildPipe({
@@ -48,21 +64,19 @@ export const getViewPageDuration = tb
     })
   : mockPipe("get_page_duration_per_view__v5");
 
-export const getTotalDocumentDuration = tb 
-  ? tb.buildPipe({
-      pipe: "get_total_document_duration__v1",
-      parameters: z.object({
-        documentId: z.string(),
-        excludedLinkIds: z.string().describe("Comma separated linkIds"),
-        excludedViewIds: z.string().describe("Comma separated viewIds"),
-        since: z.number(),
-        until: z.number().optional(),
-      }),
-      data: z.object({
-        sum_duration: z.number(),
-      }),
-    })
-  : mockPipe("get_total_document_duration__v1");
+export const getTotalDocumentDuration = createTinybirdPipe({
+  pipe: "get_total_document_duration__v1",
+  parameters: z.object({
+    documentId: z.string(),
+    excludedLinkIds: z.string().describe("Comma separated linkIds"),
+    excludedViewIds: z.string().describe("Comma separated viewIds"),
+    since: z.number(),
+    until: z.number().optional(),
+  }),
+  data: z.object({
+    sum_duration: z.number(),
+  }),
+}, "get_total_document_duration__v1");
 
 export const getTotalLinkDuration = tb 
   ? tb.buildPipe({
