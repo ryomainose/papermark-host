@@ -20,7 +20,7 @@ export default function ViewPage() {
         }}
       >
         <div className="mx-auto px-2 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center justify-between">
+          <div className="relative flex h-16 items-center justify-between">2
             <div className="flex flex-1 items-stretch justify-start">
               <div className="relative flex h-8 w-36 flex-shrink-0 items-center">
                 {brandLogo ? (
